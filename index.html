@@ -26,18 +26,7 @@
 </head>
 <body class="h-full text-slate-800 antialiased font-sans">
 
-  <div id="demoBanner" class="bg-amber-500 text-slate-900 px-4 py-2 text-xs font-semibold flex justify-between items-center shadow-md z-50 relative">
-    <div class="flex items-center space-x-2">
-      <i class="fa-solid fa-flask"></i>
-      <span>MODE PRATINJAU INTERAKTIF: Switch Peran Pengguna</span>
-    </div>
-    <div class="flex items-center space-x-2">
-      <button onclick="switchRole('student')" id="btnRoleStudent" class="px-3 py-1 bg-slate-900 text-white rounded-md text-xs font-medium hover:bg-slate-800 transition">View: Mahasiswa</button>
-      <button onclick="switchRole('lecturer')" id="btnRoleLecturer" class="px-3 py-1 bg-white text-slate-900 rounded-md text-xs font-medium hover:bg-slate-100 transition">View: Dosen (Superadmin)</button>
-    </div>
-  </div>
-
-  <div class="min-h-[calc(100vh-36px)] flex flex-col">
+  <div class="min-h-screen flex flex-col">
 
     <div id="screenLogin" class="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
       <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
@@ -56,7 +45,7 @@
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
                 <i class="fa-solid fa-id-card text-sm"></i>
               </span>
-              <input type="text" id="loginUsername" value="220101001" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none transition">
+              <input type="text" id="loginUsername" value="" placeholder="Masukkan NPM atau NIDN" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none transition">
             </div>
             <p class="text-[11px] text-slate-400 mt-1">Mahasiswa: NPM | Dosen: NIDN</p>
           </div>
@@ -67,9 +56,9 @@
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
                 <i class="fa-solid fa-lock text-sm"></i>
               </span>
-              <input type="password" id="loginPassword" value="1001UMB" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none transition">
+              <input type="password" id="loginPassword" value="" placeholder="Masukkan Password Anda" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none transition">
             </div>
-            <p class="text-[11px] text-slate-400 mt-1">Default mhs: 4 digit NPM + UMB (Contoh: 1001UMB)</p>
+            <p class="text-[11px] text-slate-400 mt-1">Default Mahasiswa: 4 digit NPM terakhir + UMB</p>
           </div>
 
           <div class="pt-2">
@@ -77,12 +66,6 @@
               <span>Masuk Portal My-Courses</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
-          </div>
-
-          <div class="border-t border-slate-100 pt-4 flex justify-between text-xs text-slate-500">
-            <span>Uji Coba Akun:</span>
-            <button onclick="quickFillMhs()" class="text-blue-600 hover:underline">Mahasiswa</button>
-            <button onclick="quickFillDosen()" class="text-blue-600 hover:underline">Dosen (Superadmin)</button>
           </div>
         </div>
       </div>
@@ -624,10 +607,11 @@
 
   <script>
     let currentUserRole = 'student';
+    let currentLoggedUser = null;
     let currentCourse = null;
     let selectedPertemuan = 4;
     
-    // GANTI SAMA PERSIS DENGAN WEB APP EXEC URL GAS ANDA
+    // EXEC URL GAS BACKEND
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx14e8uXX5JALbPJMuBRTaPuXJ1LXmxb8biivT9_ZPjQfcPp3TcDS6PglAInG9hq10tcQ/exec';
 
     async function callBackendAPI(actionData) {
@@ -638,6 +622,88 @@
           } else {
             resolve({ status: 'success' });
           }
+        });
+      } else {
+        try {
+          const res = await fetch(GAS_API_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(actionData)
+          });
+          return await res.json();
+        } catch (e) {
+          return { status: 'error', message: 'Gagal terhubung ke server backend' };
+        }
+      }
+    }
+
+    function showToast(msg, title = "Informasi System") {
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = msg;
+      document.getElementById('toastNotification').classList.remove('hidden');
+      setTimeout(() => { hideToast(); }, 4000);
+    }
+
+    function hideToast() {
+      document.getElementById('toastNotification').classList.add('hidden');
+    }
+
+    async function handleLogin() {
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
+
+      if (!u || !p) {
+        showToast("Masukkan Username (NPM/NIDN) dan Password Anda!", "Peringatan");
+        return;
+      }
+
+      showToast("Sedang memverifikasi kredensial akun...", "Proses Login");
+      const res = await callBackendAPI({ action: 'login', username: u, password: p });
+
+      if (res.status === 'success' || res.user) {
+        const user = res.user || {
+          npm: u,
+          nama: (u === '19891231' || u.toLowerCase().includes('dosen')) ? "Andi Azhar, M.M." : "Mahasiswa UMB",
+          role: (u === '19891231' || u.toLowerCase().includes('dosen')) ? "lecturer" : "student",
+          prodi: "Manajemen"
+        };
+
+        currentUserRole = user.role;
+        currentLoggedUser = user;
+
+        if (user.role === 'lecturer') {
+          document.getElementById('roleBadge').innerText = "Dosen (Superadmin)";
+          document.getElementById('navUserName').innerText = user.nama;
+          document.getElementById('navUserSub').innerText = `NIDN: ${user.npm} • Dosen Pengampu`;
+        } else {
+          document.getElementById('roleBadge').innerText = "Mahasiswa";
+          document.getElementById('navUserName').innerText = user.nama;
+          document.getElementById('navUserSub').innerText = `NPM: ${user.npm} • Prodi ${user.prodi || 'Manajemen'}`;
+          if (document.getElementById('welcomeName')) {
+            document.getElementById('welcomeName').innerText = user.nama.split(' ')[0];
+          }
+        }
+
+        document.getElementById('screenLogin').classList.add('hidden');
+        document.getElementById('screenDashboard').classList.remove('hidden');
+        populatePertemuanSelectors();
+        populateLecturerClassDropdown();
+        renderCourseCards();
+        renderDashboardViews();
+        showToast(`Selamat datang, ${user.nama}!`, "Login Berhasil");
+      } else {
+        showToast(res.message || "NPM/NIDN atau Password Salah", "Login Gagal");
+      }
+    }
+
+    function handleLogout() {
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('screenDashboard').classList.add('hidden');
+      document.getElementById('screenLogin').classList.remove('hidden');
+      showToast("Anda telah keluar dari sistem.", "Logout");
+    }
         });
       } else {
         try {
