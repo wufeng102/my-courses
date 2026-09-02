@@ -626,28 +626,33 @@
     let currentUserRole = 'student';
     let currentCourse = null;
     let selectedPertemuan = 4;
+    
+    // GANTI SAMA PERSIS DENGAN WEB APP EXEC URL GAS ANDA
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx14e8uXX5JALbPJMuBRTaPuXJ1LXmxb8biivT9_ZPjQfcPp3TcDS6PglAInG9hq10tcQ/exec';
 
-    const all11Classes = [
-      { id: 'MK01', code: 'MKP6120123005', name: 'SEMINAR PEMASARAN', sks: 3, day: 'Senin', time: '10:00 - 12:00', classRoom: 'Kelas VIIB', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK02', code: 'UMB7420123008', name: 'Kewirausahaan Berbasis PKM', sks: 2, day: 'Senin', time: '13:05 - 14:05', classRoom: 'Kelas 3C', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK03', code: 'WPS7020123043', name: 'SEARCH ENGINE OPTIMIZATION (SEO)', sks: 3, day: 'Selasa', time: '13:45 - 15:45', classRoom: 'Kelas 7A', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK04', code: 'UMB7023323008', name: 'KEWIRAUSAHAAN BERBASIS PKM', sks: 2, day: 'Selasa', time: '07:30 - 09:00', classRoom: 'Kelas 3', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK05', code: 'MKP6120123004', name: 'MANAJEMEN PEMASARAN INTERNASIONAL', sks: 3, day: 'Rabu', time: '09:45 - 11:45', classRoom: 'Kelas VIIA', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK06', code: 'UMB7020123008', name: 'KEWIRAUSAHAAN BERBASIS PKM', sks: 2, day: 'Rabu', time: '14:30 - 15:50', classRoom: 'Kelas 3 IPCS', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK07', code: 'WPS6120123024', name: 'BISNIS DIGITAL', sks: 3, day: 'Kamis', time: '10:00 - 12:00', classRoom: 'Kelas VA', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK08', code: 'UMB7420123008', name: 'Kewirausahaan Berbasis PKM', sks: 2, day: 'Kamis', time: '14:05 - 15:05', classRoom: 'Kelas 3D', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK09', code: 'WPS6920123028', name: 'METODE PENELITIAN DIGITAL', sks: 3, day: 'Jumat', time: '13:30 - 16:00', classRoom: 'Kelas 5', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK10', code: 'MBKM7020123043', name: 'Search Engine Optimization (SEO)', sks: 3, day: 'Sabtu', time: '10:00 - 12:00', classRoom: 'Kelas 7B', ytId: 'dQw4w9WgXcQ' },
-      { id: 'MK11', code: 'UMB8620823008', name: 'KEWIRAUSAHAAN BERBASIS PKM', sks: 2, day: 'Sabtu', time: '13:00 - 14:30', classRoom: 'Kelas 3', ytId: 'dQw4w9WgXcQ' }
-    ];
-
-    const mockStudents = [
-      { npm: '220101001', nama: 'Ahmad Rizky Pratama', kuis: 85.0, tugas: 90.0, pbl: 88.0, diskusi: 85.0, uts: 90.0, uas: 87.5, score: 88.45, grade: 'A' },
-      { npm: '220101002', nama: 'Budi Santoso', kuis: 80.0, tugas: 85.0, pbl: 82.0, diskusi: 80.0, uts: 85.0, uas: 80.0, score: 82.40, grade: 'B' },
-      { npm: '220101003', nama: 'Citra Lestari', kuis: 90.0, tugas: 92.0, pbl: 90.0, diskusi: 88.0, uts: 94.0, uas: 92.0, score: 91.50, grade: 'A' },
-      { npm: '220101004', nama: 'Dewi Anggraini', kuis: 75.0, tugas: 80.0, pbl: 78.0, diskusi: 82.0, uts: 78.0, uas: 80.0, score: 79.20, grade: 'B' },
-      { npm: '220101005', nama: 'Eko Prasetyo', kuis: 82.0, tugas: 88.0, pbl: 85.0, diskusi: 84.0, uts: 86.0, uas: 84.0, score: 85.10, grade: 'A' }
-    ];
+    async function callBackendAPI(actionData) {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        return new Promise((resolve) => {
+          if (actionData.action === 'login') {
+            google.script.run.withSuccessHandler(resolve).loginUser(actionData.username, actionData.password);
+          } else {
+            resolve({ status: 'success' });
+          }
+        });
+      } else {
+        try {
+          const res = await fetch(GAS_API_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(actionData)
+          });
+          return await res.json();
+        } catch (e) {
+          return { status: 'error', message: 'Gagal terhubung ke server backend' };
+        }
+      }
+    }
 
     function showToast(msg, title = "Informasi System") {
       document.getElementById('toastTitle').innerText = title;
@@ -692,17 +697,14 @@
         google.script.run.withSuccessHandler(res => {
           if(res.status === 'success') {
             switchRole(res.user.role);
-            document.getElementById('screenLogin').classList.add('hidden');
-            document.getElementById('screenDashboard').classList.remove('hidden');
-            populatePertemuanSelectors();
-            populateLecturerClassDropdown();
-            renderCourseCards();
-            renderDashboardViews();
-          } else {
-            showToast(res.message, "Login Gagal");
-          }
-        }).loginUser(u, p);
-      } else {
+    async function handleLogin() {
+      const u = document.getElementById('loginUsername').value;
+      const p = document.getElementById('loginPassword').value;
+
+      showToast("Sedang memverifikasi kredensial akun...", "Proses Login");
+      const res = await callBackendAPI({ action: 'login', username: u, password: p });
+
+      if (res.status === 'success' || !res.status) {
         if(u === '19891231' || u.toLowerCase().includes('dosen')) switchRole('lecturer');
         else switchRole('student');
         
@@ -712,6 +714,9 @@
         populateLecturerClassDropdown();
         renderCourseCards();
         renderDashboardViews();
+        showToast("Selamat datang di Portal My-Courses!", "Login Berhasil");
+      } else {
+        showToast(res.message || "NPM/NIDN atau Password Salah", "Login Gagal");
       }
     }
 
