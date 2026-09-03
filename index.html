@@ -324,9 +324,14 @@
                 </div>
 
                 <div class="flex justify-between items-center pt-1">
-                  <button onclick="loadSampleQuizJson()" class="text-[11px] font-bold text-purple-700 hover:underline">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Muat Contoh 5 Soal SEO
-                  </button>
+                  <div class="flex space-x-3">
+                    <button onclick="loadSampleQuizJson()" class="text-[11px] font-bold text-purple-700 hover:underline">
+                      <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Muat Contoh 5 Soal SEO
+                    </button>
+                    <button onclick="openPlainTextQuizModal()" class="text-[11px] font-bold text-indigo-700 hover:underline">
+                      <i class="fa-solid fa-file-import mr-1"></i>Konversi Teks Polos Soal ke JSON
+                    </button>
+                  </div>
                   <button onclick="saveQuizQuestions()" class="bg-purple-900 hover:bg-purple-800 text-white font-bold px-5 py-2 rounded-xl text-xs transition">
                     Simpan Bank Soal & Set Waktu Kuis
                   </button>
@@ -647,42 +652,44 @@
         </button>
       </div>
 
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div class="flex items-center space-x-2">
-          <label class="text-xs font-bold text-slate-700">Pilih Kelas:</label>
-          <select id="sikamuClassFilter" onchange="loadSikamuRekapTable()" class="p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold">
-          </select>
+  <!-- MODAL KONVERSI TEKS POLOS SOAL KE JSON -->
+  <div id="modalPlainTextConverter" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+      <div class="bg-indigo-900 text-white p-5 flex justify-between items-center">
+        <div>
+          <span class="text-[10px] bg-indigo-500 text-white font-extrabold px-2 py-0.5 rounded uppercase">Smart Auto-Converter</span>
+          <h3 class="text-base font-extrabold mt-1">Konversi Soal Teks Polos ke JSON</h3>
+          <p class="text-xs text-indigo-200">Tempelkan soal dari Word/PDF/Text polos dengan format biasa, sistem akan mengubahnya otomatis.</p>
         </div>
-
-        <button onclick="copySikamuTableData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-2 shadow-md shadow-emerald-600/20">
-          <i class="fa-solid fa-copy"></i>
-          <span>Salin Data ke Clipboard (SIKAMU)</span>
+        <button onclick="closePlainTextQuizModal()" class="w-8 h-8 rounded-full bg-indigo-800 text-indigo-200 hover:bg-red-600 hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="p-6 overflow-y-auto flex-1">
-        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
-          <table class="w-full text-left text-xs text-slate-700" id="sikamuTableContent">
-            <thead class="bg-slate-100 text-slate-900 font-bold uppercase text-[10px] border-b border-slate-200">
-              <tr>
-                <th class="p-3">No</th>
-                <th class="p-3">NPM</th>
-                <th class="p-3">Nama Mahasiswa</th>
-                <th class="p-3 text-center">Kuis (5%)</th>
-                <th class="p-3 text-center">Tugas (10%)</th>
-                <th class="p-3 text-center">PBL (15%)</th>
-                <th class="p-3 text-center">Forum (20%)</th>
-                <th class="p-3 text-center">UTS (25%)</th>
-                <th class="p-3 text-center">UAS (25%)</th>
-                <th class="p-3 text-center bg-blue-50">Nilai Akhir</th>
-                <th class="p-3 text-center bg-blue-50">Grade</th>
-              </tr>
-            </thead>
-            <tbody id="sikamuTableBody" class="divide-y divide-slate-200 font-medium">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
+      <div class="p-5 space-y-3 overflow-y-auto flex-1 text-xs">
+        <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 text-indigo-900 text-[11px] space-y-1">
+          <span class="font-bold block"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>Format Teks Polos Bebas (Contoh):</span>
+          <pre class="font-mono bg-white p-2 rounded border border-indigo-100 text-[10px] text-slate-700">1. Apa kepanjangan dari SEO?
+a. Search Engine Optimization
+b. Search Engine Operation
+c. Site Engine Option
+d. System Engine Output
+e. Simple Engine Optimization
+Kunci: A</pre>
         </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Tempelkan Teks Polos Soal Anda di Bawah Ini:</label>
+          <textarea id="plainTextQuizInput" rows="10" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Tempelkan soal Word/PDF Anda di sini..."></textarea>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+        <button onclick="closePlainTextQuizModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">Batal</button>
+        <button onclick="convertPlainTextToQuizJson()" class="bg-indigo-900 hover:bg-indigo-800 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition flex items-center space-x-2">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Konversi & Masukkan ke Editor</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1311,6 +1318,80 @@
 
     function openBookLibraryModal() {
       showToast("Membuka Reader PDF Pustaka Digital (Mode Read-Only / Non-Downloadable)...", "Buku Digital");
+    }
+
+    // SMART PLAIN TEXT TO JSON QUIZ CONVERTER LOGIC
+    function openPlainTextQuizModal() {
+      document.getElementById('modalPlainTextConverter').classList.remove('hidden');
+    }
+
+    function closePlainTextQuizModal() {
+      document.getElementById('modalPlainTextConverter').classList.add('hidden');
+    }
+
+    function convertPlainTextToQuizJson() {
+      const rawText = document.getElementById('plainTextQuizInput').value.trim();
+      if (!rawText) {
+        showToast("Tempelkan teks soal terlebih dahulu!", "Peringatan");
+        return;
+      }
+
+      const blocks = rawText.split(/\n\s*\n|\n(?=\d+[\.\)])/);
+      const questions = [];
+
+      blocks.forEach((block) => {
+        const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length < 3) return;
+
+        let soalText = '';
+        let optA = '', optB = '', optC = '', optD = '', optE = '';
+        let kunci = 'a';
+
+        lines.forEach((line) => {
+          const lower = line.toLowerCase();
+          
+          if (/^(kunci|jawaban|kunci jawaban)\s*[:\=-]/i.test(line)) {
+            const match = line.match(/[:\=-]\s*([a-eA-E])/);
+            if (match) kunci = match[1].toLowerCase();
+          } else if (/^[aA][\.\)]\s*/.test(line)) {
+            optA = line.replace(/^[aA][\.\)]\s*/, '').trim();
+          } else if (/^[bB][\.\)]\s*/.test(line)) {
+            optB = line.replace(/^[bB][\.\)]\s*/, '').trim();
+          } else if (/^[cC][\.\)]\s*/.test(line)) {
+            optC = line.replace(/^[cC][\.\)]\s*/, '').trim();
+          } else if (/^[dD][\.\)]\s*/.test(line)) {
+            optD = line.replace(/^[dD][\.\)]\s*/, '').trim();
+          } else if (/^[eE][\.\)]\s*/.test(line)) {
+            optE = line.replace(/^[eE][\.\)]\s*/, '').trim();
+          } else {
+            if (!optA) {
+              soalText += (soalText ? ' ' : '') + line.replace(/^\d+[\.\)]\s*/, '').trim();
+            }
+          }
+        });
+
+        if (soalText && optA && optB) {
+          questions.push({
+            soal: soalText,
+            a: optA,
+            b: optB,
+            c: optC || optB,
+            d: optD || optB,
+            e: optE || optB,
+            kunci: kunci
+          });
+        }
+      });
+
+      if (questions.length === 0) {
+        showToast("Format teks soal tidak dapat terdeteksi. Pastikan ada nomor soal, pilihan A-E, dan Kunci.", "Konversi Gagal");
+        return;
+      }
+
+      document.getElementById('setQuizQuestionsJson').value = JSON.stringify(questions, null, 2);
+      document.getElementById('quizQuestionCountDisplay').innerText = `${questions.length} Soal`;
+      closePlainTextQuizModal();
+      showToast(`Berhasil mengonversi ${questions.length} soal ke format JSON!`, "Konversi Sukses");
     }
   </script>
 </body>
