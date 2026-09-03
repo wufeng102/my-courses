@@ -22,9 +22,10 @@
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .unselectable { -webkit-user-select: none; user-select: none; }
+    .no-copy { -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
   </style>
 </head>
-<body class="h-full text-slate-800 antialiased font-sans">
+<body class="h-full text-slate-800 antialiased font-sans no-copy">
 
   <div class="min-h-screen flex flex-col">
 
@@ -67,15 +68,6 @@
               <span>Masuk Portal My-Courses</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
-          </div>
-
-          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-xs text-slate-500">
-            <span>Uji Coba Cepat:</span>
-            <div class="space-x-2">
-              <button onclick="quickFillMhs()" class="text-blue-600 hover:underline font-semibold">Mahasiswa</button>
-              <span>•</span>
-              <button onclick="quickFillDosen()" class="text-blue-600 hover:underline font-semibold">Dosen</button>
-            </div>
           </div>
         </div>
       </div>
@@ -123,9 +115,9 @@
           <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
             <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
               <div class="lg:col-span-2 space-y-2">
-                <span class="bg-blue-500/30 text-blue-200 border border-blue-400/30 text-xs px-3 py-1 rounded-full font-medium inline-block">Semester Ganjil 2026/2027</span>
-                <h2 class="text-2xl sm:text-3xl font-extrabold">Selamat Datang, <span id="welcomeName">Ahmad</span>!</h2>
-                <p class="text-blue-200 text-xs sm:text-sm max-w-xl">Portal pembelajaran My-Courses terintegrasi untuk 11 kelas mata kuliah semester ini. Klik salah satu kelas di bawah untuk melihat rincian nilai per MK.</p>
+                <span class="bg-blue-500/30 text-blue-200 border border-blue-400/30 text-xs px-3 py-1 rounded-full font-medium inline-block">Semester Aktif</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold">Selamat Datang, <span id="welcomeName">Mahasiswa</span>!</h2>
+                <p class="text-blue-200 text-xs sm:text-sm max-w-xl">Portal pembelajaran My-Courses terintegrasi untuk 11 kelas mata kuliah. Klik salah satu kelas di bawah untuk melihat materi, kuis, dan rincian nilai per MK.</p>
               </div>
 
               <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 flex items-center justify-between">
@@ -144,8 +136,8 @@
           <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start space-x-3 text-amber-900">
             <i class="fa-solid fa-clock-rotate-left text-amber-600 text-lg mt-0.5"></i>
             <div class="flex-1 text-xs">
-              <span class="font-bold block text-sm mb-0.5">Pengingat Deadline Tugas & Presensi</span>
-              <p>Mata Kuliah <strong class="underline">SEO (WPS7020123043 - Kelas 7A)</strong>: Tugas Mandiri Pertemuan 4 ditutup hari ini pukul <strong>23:59 WIB</strong>. Pastikan sudah mengunggah sebelum waktu habis!</p>
+              <span class="font-bold block text-sm mb-0.5">Pengingat Aktivitas Perkuliahan</span>
+              <p>Pastikan Anda menyelesaikan presensi lokasi GPS serta tugas & kuis sebelum batas waktu yang ditentukan oleh dosen.</p>
             </div>
           </div>
 
@@ -168,11 +160,11 @@
         <!-- LECTURER DASHBOARD VIEW -->
         <div id="lecturerMainView" class="hidden space-y-6">
           
-          <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-lg flex justify-between items-center">
+          <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <span class="text-xs bg-amber-500 text-slate-900 font-extrabold px-2.5 py-1 rounded-md uppercase">Superadmin Portal</span>
-              <h2 class="text-2xl font-black mt-2">Dashboard Dosen - My-Courses</h2>
-              <p class="text-xs text-slate-400 mt-0.5">Kelola 11 Kelas Spesifik • Setting Pertemuan 1-16 • Mode UTS/UAS • Tabel Rekap Nilai SIKAMU</p>
+              <h2 class="text-2xl font-black mt-2">Dashboard Dosen - Andi Azhar</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Kelola 11 Kelas Spesifik • Setting Pertemuan 1-16 • Bank Kuis Safe Lock • Setting UTS/UAS • Tabel Rekap SIKAMU</p>
             </div>
             <div class="flex space-x-2">
               <button onclick="showSikamuRekapModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5 shadow-lg shadow-emerald-900/30">
@@ -182,8 +174,10 @@
             </div>
           </div>
 
+          <!-- LECTURER CONTROLS GRID -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
+            <!-- PANEL SETTING PERTEMUAN & PRESENSI -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <div class="flex justify-between items-center border-b pb-3">
                 <h4 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-gears text-blue-600 mr-2"></i>Setting Pertemuan & Presensi</h4>
@@ -192,7 +186,7 @@
               <div class="space-y-3 text-xs">
                 <div>
                   <label class="font-bold text-slate-700 block mb-1">Pilih Kelas Perkuliahan (11 Kelas)</label>
-                  <select id="setPresensiMK" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-medium text-xs">
+                  <select id="setPresensiMK" onchange="syncLecturerMkSelection(this.value)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-medium text-xs">
                   </select>
                 </div>
 
@@ -259,6 +253,7 @@
               </div>
             </div>
 
+            <!-- PANEL INPUT STUDI KASUS & MATERI -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 lg:col-span-2">
               <div class="flex justify-between items-center border-b pb-3">
                 <h4 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-comments text-amber-600 mr-2"></i>Input Studi Kasus Forum Pemantik Diskusi & Materi</h4>
@@ -269,7 +264,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label class="font-bold text-slate-700 block mb-1">YouTube Video ID</label>
-                    <input type="text" id="setYtId" value="dQw4w9WgXcQ" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono">
+                    <input type="text" id="setYtId" value="dQw4w9WgXcQ" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono" placeholder="Contoh: dQw4w9WgXcQ">
                   </div>
                   <div>
                     <label class="font-bold text-slate-700 block mb-1">Link PPT Google Drive</label>
@@ -279,7 +274,7 @@
 
                 <div>
                   <label class="font-bold text-slate-700 block mb-1">Studi Kasus Pemantik Diskusi</label>
-                  <textarea id="setForumCaseText" rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg" placeholder="Tuliskan kasus/isu bisnis..."></textarea>
+                  <textarea id="setForumCaseText" rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg" placeholder="Tuliskan kasus/isu bisnis untuk didiskusikan mahasiswa..."></textarea>
                 </div>
               </div>
 
@@ -288,6 +283,56 @@
                   Publikasikan Kasus Forum & Update Materi
                 </button>
               </div>
+
+              <!-- PANEL KONTROL KUIS SAFE LOCK & BANK SOAL -->
+              <div class="border-t pt-4 mt-4 space-y-3">
+                <div class="flex justify-between items-center">
+                  <h4 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-laptop-code text-purple-600 mr-2"></i>Pengaturan Kuis Online (Safe Lock Browser)</h4>
+                  <span id="quizStatusBadge" class="text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded">Status Kuis: OFF</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-purple-50/50 p-3 rounded-xl border border-purple-100 text-xs">
+                  <div>
+                    <label class="font-bold text-purple-900 block mb-1">Akses Kuis (ON / OFF)</label>
+                    <select id="setQuizToggle" onchange="toggleQuizAccess(this.value)" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
+                      <option value="OFF">OFF (Terkunci / Belum Dibuka)</option>
+                      <option value="ON">ON (Dapat Diakses Mahasiswa)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="font-bold text-purple-900 block mb-1">Durasi Kuis (Menit)</label>
+                    <input type="number" id="setQuizDuration" value="20" min="5" max="180" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold">
+                  </div>
+
+                  <div>
+                    <label class="font-bold text-purple-900 block mb-1">Jumlah Soal Terdaftar</label>
+                    <p class="p-2 bg-white border border-slate-200 rounded-lg font-bold text-purple-700" id="quizQuestionCountDisplay">0 Soal</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="font-bold text-slate-700 text-xs block mb-1">Input / Upload Bank Soal Pilihan Ganda (Format JSON atau Form)</label>
+                  <textarea id="setQuizQuestionsJson" rows="4" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono" placeholder='Format JSON:
+[
+  {
+    "soal": "Apa kepanjangan dari SEO?",
+    "a": "Search Engine Optimization", "b": "Search Engine Operation", "c": "Site Engine Option", "d": "System Engine Output", "e": "Simple Engine Optimization",
+    "kunci": "a"
+  }
+]'></textarea>
+                </div>
+
+                <div class="flex justify-between items-center pt-1">
+                  <button onclick="loadSampleQuizJson()" class="text-[11px] font-bold text-purple-700 hover:underline">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Muat Contoh 5 Soal SEO
+                  </button>
+                  <button onclick="saveQuizQuestions()" class="bg-purple-900 hover:bg-purple-800 text-white font-bold px-5 py-2 rounded-xl text-xs transition">
+                    Simpan Bank Soal & Set Waktu Kuis
+                  </button>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -316,7 +361,7 @@
                 <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md" id="detailMkSchedule">Selasa | 13:45 - 15:45 | Kelas 7A</span>
               </div>
               <h1 class="text-2xl font-black text-slate-900" id="detailMkTitle">SEARCH ENGINE OPTIMIZATION (SEO)</h1>
-              <p class="text-xs text-slate-500 mt-1">Dosen Pengampu: Andi Azhar, M.M. • Ruang Kelas / Google Meet</p>
+              <p class="text-xs text-slate-500 mt-1">Dosen Pengampu: Andi Azhar • Ruang Kelas / Google Meet</p>
             </div>
 
             <button onclick="triggerAbsensiLocation()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center space-x-2">
@@ -330,13 +375,13 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-2">
               <div>
                 <h3 class="font-bold text-slate-900 text-base">Transparansi Penilaian Akumulatif (Khusus MK Ini)</h3>
-                <p class="text-xs text-slate-500">Nilai riil dan terbobot dikalkulasi berdasarkan komposisi penilaian UMB.</p>
+                <p class="text-xs text-slate-500">Nilai riil dan terbobot dikalkulasi berdasarkan komposisi penilaian kampus.</p>
               </div>
 
               <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white px-5 py-2.5 rounded-2xl flex items-center space-x-3 shadow-md">
                 <div>
                   <span class="text-[10px] text-blue-200 font-bold uppercase tracking-wider block">Estimasi Nilai Akhir MK</span>
-                  <span class="text-2xl font-black text-amber-400" id="mkFinalScoreDisplay">88.45 <span class="text-sm font-bold text-white">(A)</span></span>
+                  <span class="text-2xl font-black text-amber-400" id="mkFinalScoreDisplay">0.00 <span class="text-sm font-bold text-white">(E)</span></span>
                 </div>
                 <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
                   <i class="fa-solid fa-award text-amber-300 text-xl"></i>
@@ -346,56 +391,56 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                <span class="text-[10px] text-slate-500 font-bold uppercase block">Kuis (Avg 4x)</span>
-                <p class="text-sm font-extrabold text-blue-900" id="gradeRawKuis">85.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
+                <span class="text-[10px] text-slate-500 font-bold uppercase block">Kuis (Avg)</span>
+                <p class="text-sm font-extrabold text-blue-900" id="gradeRawKuis">0.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
                 <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-200">
                   <span>Bobot: 5%</span>
-                  <strong class="text-blue-700" id="gradeWeightedKuis">4.25 Poin</strong>
+                  <strong class="text-blue-700" id="gradeWeightedKuis">0.00 Poin</strong>
                 </div>
               </div>
 
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                <span class="text-[10px] text-slate-500 font-bold uppercase block">Tugas (Avg 6x)</span>
-                <p class="text-sm font-extrabold text-blue-900" id="gradeRawTugas">90.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
+                <span class="text-[10px] text-slate-500 font-bold uppercase block">Tugas (Avg)</span>
+                <p class="text-sm font-extrabold text-blue-900" id="gradeRawTugas">0.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
                 <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-200">
                   <span>Bobot: 10%</span>
-                  <strong class="text-blue-700" id="gradeWeightedTugas">9.00 Poin</strong>
+                  <strong class="text-blue-700" id="gradeWeightedTugas">0.00 Poin</strong>
                 </div>
               </div>
 
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
                 <span class="text-[10px] text-slate-500 font-bold uppercase block">PBL / Kelompok</span>
-                <p class="text-sm font-extrabold text-blue-900" id="gradeRawPBL">88.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
+                <p class="text-sm font-extrabold text-blue-900" id="gradeRawPBL">0.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
                 <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-200">
                   <span>Bobot: 15%</span>
-                  <strong class="text-blue-700" id="gradeWeightedPBL">13.20 Poin</strong>
+                  <strong class="text-blue-700" id="gradeWeightedPBL">0.00 Poin</strong>
                 </div>
               </div>
 
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
                 <span class="text-[10px] text-slate-500 font-bold uppercase block">Diskusi Forum</span>
-                <p class="text-sm font-extrabold text-blue-900" id="gradeRawDiskusi">85.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
+                <p class="text-sm font-extrabold text-blue-900" id="gradeRawDiskusi">0.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
                 <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-200">
                   <span>Bobot: 20%</span>
-                  <strong class="text-blue-700" id="gradeWeightedDiskusi">17.00 Poin</strong>
+                  <strong class="text-blue-700" id="gradeWeightedDiskusi">0.00 Poin</strong>
                 </div>
               </div>
 
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
                 <span class="text-[10px] text-slate-500 font-bold uppercase block">UTS (Ujian Tengah)</span>
-                <p class="text-sm font-extrabold text-blue-900" id="gradeRawUTS">90.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
+                <p class="text-sm font-extrabold text-blue-900" id="gradeRawUTS">0.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
                 <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-200">
                   <span>Bobot: 25%</span>
-                  <strong class="text-blue-700" id="gradeWeightedUTS">22.50 Poin</strong>
+                  <strong class="text-blue-700" id="gradeWeightedUTS">0.00 Poin</strong>
                 </div>
               </div>
 
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
                 <span class="text-[10px] text-slate-500 font-bold uppercase block">UAS (Ujian Akhir)</span>
-                <p class="text-sm font-extrabold text-blue-900" id="gradeRawUAS">87.5 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
+                <p class="text-sm font-extrabold text-blue-900" id="gradeRawUAS">0.0 <span class="text-[10px] text-slate-400 font-normal">/ 100</span></p>
                 <div class="text-[10px] text-slate-500 flex justify-between pt-1 border-t border-slate-200">
                   <span>Bobot: 25%</span>
-                  <strong class="text-blue-700" id="gradeWeightedUAS">21.88 Poin</strong>
+                  <strong class="text-blue-700" id="gradeWeightedUAS">0.00 Poin</strong>
                 </div>
               </div>
             </div>
@@ -460,7 +505,7 @@
                   <h3 class="font-bold text-base text-slate-900">Pengiriman Tugas Perkuliahan / Laporan Ujian</h3>
                   <p class="text-xs text-slate-500">Dikirim ke Antrian Evaluasi AI Engine untuk <span id="currentPertemuanLabel" class="font-bold text-blue-700">Pertemuan 4</span>.</p>
                 </div>
-                <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-md">Deadline: Besok 23:59 WIB</span>
+                <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-md">Deadline: Sesuai Jadwal Dosen</span>
               </div>
 
               <div class="flex space-x-4 border-b border-slate-100 pb-3">
@@ -476,11 +521,9 @@
 
               <div id="groupSelectionArea" class="hidden space-y-2 p-3 bg-purple-50/50 rounded-xl border border-purple-100">
                 <label class="block text-xs font-bold text-purple-900">Pilih Anggota Kelompok Anda (Otomatis Sync Nilai Individu):</label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                  <label class="flex items-center space-x-2 bg-white p-2 rounded border border-slate-200"><input type="checkbox" checked disabled> <span>220101001 - Saya (Ketua)</span></label>
-                  <label class="flex items-center space-x-2 bg-white p-2 rounded border border-slate-200"><input type="checkbox" value="220101002"> <span>220101002 - Budi S.</span></label>
-                  <label class="flex items-center space-x-2 bg-white p-2 rounded border border-slate-200"><input type="checkbox" value="220101003"> <span>220101003 - Citra L.</span></label>
-                  <label class="flex items-center space-x-2 bg-white p-2 rounded border border-slate-200"><input type="checkbox" value="220101004"> <span>220101004 - Dewi A.</span></label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs" id="groupMembersChecklist">
+                  <!-- Rendered dynamically from registered students -->
+                  <p class="text-slate-400 text-xs italic col-span-3">Pilih anggota kelompok setelah data mahasiswa terdaftar.</p>
                 </div>
               </div>
 
@@ -499,24 +542,10 @@
             </div>
 
             <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <h3 class="font-bold text-base text-slate-900 border-b pb-3">Riwayat Penilaian MK Ini</h3>
+              <h3 class="font-bold text-base text-slate-900 border-b pb-3">Riwayat Penilaian Saya</h3>
               
-              <div class="space-y-3 text-xs">
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
-                  <div class="flex justify-between font-bold">
-                    <span>Tugas Mandiri (Pertemuan 1)</span>
-                    <span class="text-emerald-600">Nilai: 90 / 100</span>
-                  </div>
-                  <p class="text-[11px] text-slate-500">Evaluasi AI: Analisis keyword SEO tepat, struktur pembahasan runtut.</p>
-                </div>
-
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
-                  <div class="flex justify-between font-bold">
-                    <span>Kuis (Pertemuan 2)</span>
-                    <span class="text-emerald-600">Nilai: 85 / 100</span>
-                  </div>
-                  <p class="text-[11px] text-slate-500">Hasil dari Safe Browser Quiz Engine.</p>
-                </div>
+              <div class="space-y-3 text-xs" id="submissionHistoryContainer">
+                <p class="text-slate-400 text-xs italic">Belum ada riwayat pengerjaan tugas yang tersimpan.</p>
               </div>
             </div>
           </div>
@@ -537,7 +566,7 @@
                 <span class="text-[10px] bg-blue-200 text-blue-800 px-2 py-0.5 rounded font-bold">Kasus Aktif</span>
               </div>
               <p class="text-xs leading-relaxed font-medium" id="caseStudyTextDisplay">
-                "Bagaimana pengaruh penggunaan AI Generatif terhadap algoritma SERP Google terbaru tahun 2026? Apakah konten berbasis AI tanpa sentuhan riset manusia akan menurunkan ranking website bisnis lokal?"
+                "Silakan berikan analisis kritis Anda mengenai topik pembelajaran pada pertemuan ini. Sertakan contoh kasus penerapan nyata di lapangan!"
               </p>
             </div>
 
@@ -559,6 +588,49 @@
 
     </div>
 
+  </div>
+
+  <!-- FULLSCREEN SAFE LOCKDOWN QUIZ MODAL -->
+  <div id="quizLockdownModal" class="hidden fixed inset-0 z-50 bg-slate-950 text-white flex flex-col no-copy">
+    <!-- SAFE LOCK HEADER BAR -->
+    <div class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1 rounded-full font-bold flex items-center space-x-1">
+          <i class="fa-solid fa-shield-halved text-red-400 animate-pulse"></i>
+          <span>SAFE LOCKDOWN MODE ACTIVE</span>
+        </span>
+        <h3 class="font-extrabold text-sm text-slate-100" id="quizModalCourseTitle">KUIS ONLINE</h3>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-xl flex items-center space-x-2">
+          <i class="fa-solid fa-stopwatch text-amber-400"></i>
+          <span class="text-xs font-mono font-bold text-amber-300" id="quizTimerDisplay">20:00</span>
+        </div>
+        <button onclick="confirmExitQuizEarly()" class="text-xs text-slate-400 hover:text-red-400 font-bold underline">Batal & Keluar</button>
+      </div>
+    </div>
+
+    <!-- QUIZ BODY CONTENT -->
+    <div class="flex-1 overflow-y-auto p-6 max-w-4xl w-full mx-auto space-y-6">
+      <div class="bg-red-950/40 border border-red-500/30 rounded-2xl p-4 text-xs text-red-200 flex items-start space-x-3">
+        <i class="fa-solid fa-triangle-exclamation text-red-400 text-lg mt-0.5"></i>
+        <div>
+          <span class="font-bold text-red-300 block mb-0.5">PERATURAN KETAT SAFE LOCKDOWN:</span>
+          <p>Dilarang berpindah tab browser, meminimize window, atau membuka aplikasi lain selama ujian. Jika terdeteksi meninggalkan halaman ini, ujian akan **LANGSUNG DIHENTIKAN**, dan Anda mendapatkan **NILAI 0** tanpa kesempatan mengulang!</p>
+        </div>
+      </div>
+
+      <div id="quizQuestionsContainer" class="space-y-6">
+        <!-- Rendered dynamically with randomized questions & randomized options -->
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 flex justify-end">
+        <button onclick="submitQuizAnswers()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-8 py-3 rounded-2xl shadow-lg transition">
+          Selesaikan & Selesai Kuis
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL SIKAMU REKAP -->
@@ -627,14 +699,23 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    let currentUser = null;
     let currentUserRole = 'student';
     let currentCourse = null;
     let selectedPertemuan = 4;
     
+    // SAFE LOCK QUIZ STATE
+    let activeQuizTimer = null;
+    let quizRemainingSeconds = 1200; // default 20 mins
+    let quizActive = false;
+    let activeQuizData = [];
+    let registeredQuizBank = {}; // { 'MK_ID_Pertemuan': { status: 'ON', duration: 20, questions: [...] } }
+    let registeredStudents = []; // populated from Sheets or user login
+
     // API EXEC URL GOOGLE APPS SCRIPT
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx14e8uXX5JALbPJMuBRTaPuXJ1LXmxb8biivT9_ZPjQfcPp3TcDS6PglAInG9hq10tcQ/exec';
 
-    // 11 DAFTAR KELAS LENGKAP DOSEN
+    // 11 DAFTAR KELAS LENGKAP DOSEN ANDI AZHAR
     const all11Classes = [
       { id: 'MK01', code: 'MKP6120123005', name: 'SEMINAR PEMASARAN', sks: 3, day: 'Senin', time: '10:00 - 12:00', classRoom: 'VIIB' },
       { id: 'MK02', code: 'UMB7420123008', name: 'KEWIRAUSAHAAN BERBASIS PKM', sks: 2, day: 'Senin', time: '13:05 - 14:05', classRoom: '3C' },
@@ -647,13 +728,6 @@
       { id: 'MK09', code: 'WPS6920123028', name: 'METODE PENELITIAN DIGITAL', sks: 3, day: 'Jumat', time: '13:30 - 16:00', classRoom: '5' },
       { id: 'MK10', code: 'MBKM7020123043', name: 'SEARCH ENGINE OPTIMIZATION (SEO)', sks: 3, day: 'Sabtu', time: '10:00 - 12:00', classRoom: '7B' },
       { id: 'MK11', code: 'UMB8620823008', name: 'KEWIRAUSAHAAN BERBASIS PKM', sks: 2, day: 'Sabtu', time: '13:00 - 14:30', classRoom: '3' }
-    ];
-
-    const mockStudents = [
-      { npm: '220101001', nama: 'Ahmad Rizky Pratama', kuis: 85, tugas: 90, pbl: 88, diskusi: 85, uts: 90, uas: 87.5, score: 88.45, grade: 'A' },
-      { npm: '220101002', nama: 'Budi Santoso', kuis: 80, tugas: 85, pbl: 82, diskusi: 80, uts: 88, uas: 85, score: 84.10, grade: 'B' },
-      { npm: '220101003', nama: 'Citra Lestari', kuis: 90, tugas: 92, pbl: 95, diskusi: 90, uts: 92, uas: 90, score: 91.55, grade: 'A' },
-      { npm: '220101004', nama: 'Dewi Anggraini', kuis: 78, tugas: 80, pbl: 85, diskusi: 82, uts: 80, uas: 82, score: 81.35, grade: 'B' }
     ];
 
     async function callBackendAPI(actionData) {
@@ -691,26 +765,18 @@
       document.getElementById('toastNotification').classList.add('hidden');
     }
 
-    function quickFillMhs() {
-      document.getElementById('loginUsername').value = '220101001';
-      document.getElementById('loginPassword').value = '1001UMB';
-    }
-
-    function quickFillDosen() {
-      document.getElementById('loginUsername').value = '19891231';
-      document.getElementById('loginPassword').value = 'DOSENUMB';
-    }
-
     function switchRole(role, name, idNumber, prodi = 'Manajemen') {
       currentUserRole = role;
+      currentUser = { npm: idNumber, nama: name, role: role, prodi: prodi };
+
       if(role === 'student') {
         document.getElementById('roleBadge').innerText = "Mahasiswa";
-        document.getElementById('navUserName').innerText = name || "Ahmad Rizky Pratama";
-        document.getElementById('navUserSub').innerText = `NPM: ${idNumber || '220101001'} • Prodi ${prodi}`;
-        document.getElementById('welcomeName').innerText = (name || "Ahmad").split(' ')[0];
+        document.getElementById('navUserName').innerText = name || "Mahasiswa";
+        document.getElementById('navUserSub').innerText = `NPM: ${idNumber} • Prodi ${prodi}`;
+        document.getElementById('welcomeName').innerText = (name || "Mahasiswa").split(' ')[0];
       } else {
         document.getElementById('roleBadge').innerText = "Dosen (Superadmin)";
-        document.getElementById('navUserName').innerText = name || "Andi Azhar, M.M.";
+        document.getElementById('navUserName').innerText = name || "Andi Azhar";
         document.getElementById('navUserSub').innerText = `NIDN: ${idNumber || '19891231'} • Dosen Pengampu`;
       }
       renderDashboardViews();
@@ -721,17 +787,17 @@
       const expectedPass = last4 + 'UMB';
       
       if (u === '19891231' && (p === 'DOSENUMB' || p === '19891231')) {
-        switchRole('lecturer', 'Andi Azhar, M.M.', '19891231', 'Dosen');
+        switchRole('lecturer', 'Andi Azhar', '19891231', 'Dosen');
         document.getElementById('screenLogin').classList.add('hidden');
         document.getElementById('screenDashboard').classList.remove('hidden');
         populatePertemuanSelectors();
         populateLecturerClassDropdown();
         renderCourseCards();
         renderDashboardViews();
-        showToast("Selamat datang kembali, Andi Azhar, M.M.!", "Login Dosen Berhasil");
+        showToast("Selamat datang kembali, Andi Azhar!", "Login Dosen Berhasil");
         return true;
-      } else if ((p === expectedPass || p === '1001UMB') && u.length >= 6) {
-        switchRole('student', 'Ahmad Rizky Pratama', u, 'Manajemen');
+      } else if (p === expectedPass && u.length >= 6) {
+        switchRole('student', `Mahasiswa (${u})`, u, 'Manajemen');
         document.getElementById('screenLogin').classList.add('hidden');
         document.getElementById('screenDashboard').classList.remove('hidden');
         populatePertemuanSelectors();
@@ -775,7 +841,7 @@
         }
       } catch (e) {
         if (checkLocalAuthFallback(u, p)) return;
-        showToast("Terjadi kendala koneksi server. Periksa kembali NIDN/NPM Anda.", "Login Terkendala");
+        showToast("Terjadi kendala koneksi. Gunakan kredensial NPM & Password baku.", "Login Terkendala");
       }
     }
 
@@ -830,8 +896,7 @@
       const container = document.getElementById('courseCardsGrid');
       container.innerHTML = '';
 
-      all11Classes.forEach((c, idx) => {
-        const mockRawGrade = (86.5 + (idx % 4)).toFixed(1);
+      all11Classes.forEach((c) => {
         container.innerHTML += `
           <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between space-y-4">
             <div>
@@ -845,8 +910,8 @@
 
             <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
               <div>
-                <span class="text-[10px] text-slate-400 block font-semibold uppercase">Estimasi Nilai MK</span>
-                <span class="text-xs font-black text-blue-800">${mockRawGrade} (A)</span>
+                <span class="text-[10px] text-slate-400 block font-semibold uppercase">Status MK</span>
+                <span class="text-xs font-black text-emerald-700">Aktif</span>
               </div>
               <button onclick="openCourseDetail('${c.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition">
                 Masuk Kelas
@@ -870,6 +935,260 @@
 
     function closeCourseDetail() { renderDashboardViews(); }
 
+    function syncLecturerMkSelection(mkId) {
+      const pert = document.getElementById('setPertemuanLecturer').value;
+      const key = `${mkId}_${pert}`;
+      const existing = registeredQuizBank[key];
+
+      if (existing) {
+        document.getElementById('setQuizToggle').value = existing.status || 'OFF';
+        document.getElementById('setQuizDuration').value = existing.duration || 20;
+        document.getElementById('setQuizQuestionsJson').value = JSON.stringify(existing.questions || [], null, 2);
+        document.getElementById('quizStatusBadge').innerText = `Status Kuis: ${existing.status || 'OFF'}`;
+        document.getElementById('quizQuestionCountDisplay').innerText = `${(existing.questions || []).length} Soal`;
+      } else {
+        document.getElementById('setQuizToggle').value = 'OFF';
+        document.getElementById('setQuizDuration').value = 20;
+        document.getElementById('setQuizQuestionsJson').value = '';
+        document.getElementById('quizStatusBadge').innerText = 'Status Kuis: OFF';
+        document.getElementById('quizQuestionCountDisplay').innerText = '0 Soal';
+      }
+    }
+
+    function loadSampleQuizJson() {
+      const sample = [
+        {
+          "soal": "Apa kepanjangan dari SEO dalam dunia pemasaran digital?",
+          "a": "Search Engine Optimization", "b": "Search Engine Operation", "c": "Site Engine Option", "d": "System Engine Output", "e": "Simple Engine Optimization",
+          "kunci": "a"
+        },
+        {
+          "soal": "Algoritma mana yang digunakan Google untuk mengukur kualitas pengalaman pengguna pada halaman web?",
+          "a": "PageRank", "b": "Core Web Vitals", "c": "Penguin Update", "d": "Panda Update", "e": "Hummingbird",
+          "kunci": "b"
+        },
+        {
+          "soal": "Tag HTML yang paling krusial untuk memberikan judul halaman pada hasil pencarian (SERP) adalah?",
+          "a": "<h1>", "b": "<meta description>", "c": "<title>", "d": "<b>", "e": "<header>",
+          "kunci": "c"
+        },
+        {
+          "soal": "Strategi SEO yang berfokus pada optimasi konten dan struktur internal website disebut?",
+          "a": "Off-Page SEO", "b": "On-Page SEO", "c": "Technical SEO", "d": "Black Hat SEO", "e": "Local SEO",
+          "kunci": "b"
+        },
+        {
+          "soal": "Praktik manipulatif yang melanggar pedoman webmaster Google dinamakan?",
+          "a": "White Hat SEO", "b": "Grey Hat SEO", "c": "Black Hat SEO", "d": "Blue Hat SEO", "e": "Clean SEO",
+          "kunci": "c"
+        }
+      ];
+      document.getElementById('setQuizQuestionsJson').value = JSON.stringify(sample, null, 2);
+      showToast("Contoh 5 soal SEO berhasil dimuat ke dalam editor!", "Sample Loaded");
+    }
+
+    function saveQuizQuestions() {
+      const mkId = document.getElementById('setPresensiMK').value;
+      const pert = document.getElementById('setPertemuanLecturer').value;
+      const toggle = document.getElementById('setQuizToggle').value;
+      const duration = parseInt(document.getElementById('setQuizDuration').value) || 20;
+      const jsonText = document.getElementById('setQuizQuestionsJson').value;
+
+      let questions = [];
+      if (jsonText.trim().length > 0) {
+        try {
+          questions = JSON.parse(jsonText);
+        } catch(e) {
+          showToast("Format JSON Soal tidak valid! Periksa penulisan tanda kurung dan petik.", "Format Error");
+          return;
+        }
+      }
+
+      const key = `${mkId}_${pert}`;
+      registeredQuizBank[key] = {
+        status: toggle,
+        duration: duration,
+        questions: questions
+      };
+
+      document.getElementById('quizStatusBadge').innerText = `Status Kuis: ${toggle}`;
+      document.getElementById('quizQuestionCountDisplay').innerText = `${questions.length} Soal`;
+
+      showToast(`Bank Soal Kuis untuk Pertemuan ${pert} berhasil disimpan! Status: ${toggle}`, "Kuis Dosen Disimpan");
+    }
+
+    function toggleQuizAccess(val) {
+      document.getElementById('quizStatusBadge').innerText = `Status Kuis: ${val}`;
+    }
+
+    // SHUFFLE HELPER (FISHER-YATES)
+    function shuffleArray(arr) {
+      let array = [...arr];
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startQuizLauncher() {
+      if (!currentCourse) {
+        showToast("Pilih mata kuliah terlebih dahulu!", "Peringatan");
+        return;
+      }
+
+      const key = `${currentCourse.id}_${selectedPertemuan}`;
+      const quizConfig = registeredQuizBank[key];
+
+      if (!quizConfig || quizConfig.status !== 'ON' || !quizConfig.questions || quizConfig.questions.length === 0) {
+        showToast(`Kuis untuk Pertemuan ${selectedPertemuan} belum dibuka atau soal belum diunggah oleh Dosen.`, "Kuis Terkunci");
+        return;
+      }
+
+      // Check if student was previously locked out for cheating
+      const cheatKey = `cheated_${currentUser.npm}_${key}`;
+      if (localStorage.getItem(cheatKey)) {
+        showToast("Anda terdeteksi pernah melakukan pelanggaran (keluar dari Safe Lock Browser). Ujian dibatalkan dan nilai Anda 0.", "Ujian Dibatalkan");
+        return;
+      }
+
+      // Prepare Randomized Questions & Randomized Options
+      activeQuizData = quizConfig.questions.map((q, idx) => {
+        const rawOptions = [
+          { key: 'a', text: q.a },
+          { key: 'b', text: q.b },
+          { key: 'c', text: q.c },
+          { key: 'd', text: q.d },
+          { key: 'e', text: q.e }
+        ];
+        return {
+          id: idx + 1,
+          soalText: q.soal,
+          correctKey: q.kunci,
+          shuffledOptions: shuffleArray(rawOptions)
+        };
+      });
+      activeQuizData = shuffleArray(activeQuizData);
+
+      // Render Questions
+      const container = document.getElementById('quizQuestionsContainer');
+      container.innerHTML = '';
+
+      activeQuizData.forEach((q, idx) => {
+        let optionsHtml = '';
+        q.shuffledOptions.forEach((opt) => {
+          optionsHtml += `
+            <label class="flex items-center space-x-3 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 hover:border-purple-500 cursor-pointer transition">
+              <input type="radio" name="question_${q.id}" value="${opt.key}" class="text-purple-600 focus:ring-purple-500">
+              <span class="text-xs font-medium text-slate-200">${opt.text}</span>
+            </label>
+          `;
+        });
+
+        container.innerHTML += `
+          <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <span class="text-xs font-bold text-purple-400">Pertanyaan ${idx + 1} dari ${activeQuizData.length}</span>
+            <p class="text-sm font-semibold text-white leading-relaxed">${q.soalText}</p>
+            <div class="grid grid-cols-1 gap-2 pt-2">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      // Set Timer
+      quizRemainingSeconds = (quizConfig.duration || 20) * 60;
+      updateQuizTimerDisplay();
+      
+      if (activeQuizTimer) clearInterval(activeQuizTimer);
+      activeQuizTimer = setInterval(tickQuizTimer, 1000);
+
+      document.getElementById('quizModalCourseTitle').innerText = `${currentCourse.name} - PERTEMUAN ${selectedPertemuan}`;
+      document.getElementById('quizLockdownModal').classList.remove('hidden');
+      quizActive = true;
+
+      // Attach strict focus/tab listeners
+      window.addEventListener('blur', handleQuizViolation);
+      document.addEventListener('visibilitychange', handleQuizVisibilityChange);
+      showToast("Safe Lockdown Mode Diaktifkan! Dilarang memindahkan tab atau aplikasi.", "Kuis Dimulai");
+    }
+
+    function tickQuizTimer() {
+      if (!quizActive) return;
+      quizRemainingSeconds--;
+      updateQuizTimerDisplay();
+
+      if (quizRemainingSeconds <= 0) {
+        clearInterval(activeQuizTimer);
+        showToast("Waktu kuis telah habis! Jawaban dikirim otomatis.", "Waktu Habis");
+        submitQuizAnswers();
+      }
+    }
+
+    function updateQuizTimerDisplay() {
+      const mins = Math.floor(quizRemainingSeconds / 60);
+      const secs = quizRemainingSeconds % 60;
+      document.getElementById('quizTimerDisplay').innerText = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function handleQuizVisibilityChange() {
+      if (quizActive && document.hidden) {
+        handleQuizViolation();
+      }
+    }
+
+    function handleQuizViolation() {
+      if (!quizActive) return;
+      quizActive = false;
+      if (activeQuizTimer) clearInterval(activeQuizTimer);
+
+      window.removeEventListener('blur', handleQuizViolation);
+      document.removeEventListener('visibilitychange', handleQuizVisibilityChange);
+
+      const key = `${currentCourse.id}_${selectedPertemuan}`;
+      const cheatKey = `cheated_${currentUser.npm}_${key}`;
+      localStorage.setItem(cheatKey, 'true');
+
+      document.getElementById('quizLockdownModal').classList.add('hidden');
+      showToast("PELANGGARAN TERDETEKSI! Anda meninggalkan halaman Safe Lock. Kuis dibatalkan dan nilai Anda otomatis 0.", "Pelanggaran Ujian");
+      
+      // Update grade to 0
+      document.getElementById('gradeRawKuis').innerText = "0.0";
+      document.getElementById('gradeWeightedKuis').innerText = "0.00 Poin";
+    }
+
+    function submitQuizAnswers() {
+      if (!quizActive) return;
+      quizActive = false;
+      if (activeQuizTimer) clearInterval(activeQuizTimer);
+
+      window.removeEventListener('blur', handleQuizViolation);
+      document.removeEventListener('visibilitychange', handleQuizVisibilityChange);
+
+      let correctCount = 0;
+      activeQuizData.forEach((q) => {
+        const selected = document.querySelector(`input[name="question_${q.id}"]:checked`);
+        if (selected && selected.value === q.correctKey) {
+          correctCount++;
+        }
+      });
+
+      const totalQuestions = activeQuizData.length;
+      const score = Math.round((correctCount / totalQuestions) * 100);
+
+      document.getElementById('quizLockdownModal').classList.add('hidden');
+      document.getElementById('gradeRawKuis').innerText = `${score}.0`;
+      const weighted = (score * 0.05).toFixed(2);
+      document.getElementById('gradeWeightedKuis').innerText = `${weighted} Poin`;
+
+      showToast(`Kuis Selesai! Benar: ${correctCount}/${totalQuestions} • Skor Anda: ${score} / 100`, "Hasil Kuis");
+    }
+
+    function confirmExitQuizEarly() {
+      showToast("Jika keluar sekarang, jawaban tidak akan tersimpan. Pelanggaran akan mencatat nilai 0.", "Peringatan Exit");
+      handleQuizViolation();
+    }
+
     function showSikamuRekapModal() {
       document.getElementById('modalSikamuRekap').classList.remove('hidden');
       loadSikamuRekapTable();
@@ -882,20 +1201,32 @@
     function loadSikamuRekapTable() {
       const tbody = document.getElementById('sikamuTableBody');
       tbody.innerHTML = '';
-      mockStudents.forEach((s, idx) => {
+
+      if (registeredStudents.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="p-6 text-center text-slate-400 italic">
+              Belum ada data mahasiswa terdaftar di Google Sheets. Unggah data ke tab "Users" untuk menampilkan tabel SIKAMU.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      registeredStudents.forEach((s, idx) => {
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-3">${idx + 1}</td>
             <td class="p-3 font-bold text-slate-900">${s.npm}</td>
             <td class="p-3 font-semibold">${s.nama}</td>
-            <td class="p-3 text-center">${s.kuis.toFixed(1)}</td>
-            <td class="p-3 text-center">${s.tugas.toFixed(1)}</td>
-            <td class="p-3 text-center">${s.pbl.toFixed(1)}</td>
-            <td class="p-3 text-center">${s.diskusi.toFixed(1)}</td>
-            <td class="p-3 text-center">${s.uts.toFixed(1)}</td>
-            <td class="p-3 text-center">${s.uas.toFixed(1)}</td>
-            <td class="p-3 text-center font-bold text-blue-900 bg-blue-50/50">${s.score.toFixed(2)}</td>
-            <td class="p-3 text-center font-extrabold text-emerald-700 bg-blue-50/50">${s.grade}</td>
+            <td class="p-3 text-center">${(s.kuis || 0).toFixed(1)}</td>
+            <td class="p-3 text-center">${(s.tugas || 0).toFixed(1)}</td>
+            <td class="p-3 text-center">${(s.pbl || 0).toFixed(1)}</td>
+            <td class="p-3 text-center">${(s.diskusi || 0).toFixed(1)}</td>
+            <td class="p-3 text-center">${(s.uts || 0).toFixed(1)}</td>
+            <td class="p-3 text-center">${(s.uas || 0).toFixed(1)}</td>
+            <td class="p-3 text-center font-bold text-blue-900 bg-blue-50/50">${(s.score || 0).toFixed(2)}</td>
+            <td class="p-3 text-center font-extrabold text-emerald-700 bg-blue-50/50">${s.grade || 'E'}</td>
           </tr>
         `;
       });
@@ -903,8 +1234,8 @@
 
     function copySikamuTableData() {
       let tText = "No\tNPM\tNama Mahasiswa\tKuis (5%)\tTugas (10%)\tPBL (15%)\tForum (20%)\tUTS (25%)\tUAS (25%)\tNilai Akhir\tGrade\n";
-      mockStudents.forEach((s, idx) => {
-        tText += `${idx+1}\t${s.npm}\t${s.nama}\t${s.kuis}\t${s.tugas}\t${s.pbl}\t${s.diskusi}\t${s.uts}\t${s.uas}\t${s.score}\t${s.grade}\n`;
+      registeredStudents.forEach((s, idx) => {
+        tText += `${idx+1}\t${s.npm}\t${s.nama}\t${s.kuis || 0}\t${s.tugas || 0}\t${s.pbl || 0}\t${s.diskusi || 0}\t${s.uts || 0}\t${s.uas || 0}\t${s.score || 0}\t${s.grade || 'E'}\n`;
       });
       
       const el = document.createElement('textarea');
@@ -921,7 +1252,7 @@
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => showToast(`Lokasi GPS Valid: Lat ${pos.coords.latitude.toFixed(4)}, Lng ${pos.coords.longitude.toFixed(4)}. Absensi Pertemuan ${selectedPertemuan} Berhasil!`, "Absensi GPS Sukses"),
-          (err) => showToast(`Absensi Pertemuan ${selectedPertemuan} berhasil dikonfirmasi!`, "Absensi Sukses")
+          () => showToast(`Absensi Pertemuan ${selectedPertemuan} berhasil dikonfirmasi!`, "Absensi Sukses")
         );
       } else {
         showToast("Geolocation tidak didukung oleh browser Anda.");
@@ -937,7 +1268,7 @@
     function submitTaskToQueue() {
       const txt = document.getElementById('taskAnswerText').value;
       if(!txt) { showToast("Tuliskan jawaban atau link laporan terlebih dahulu!", "Peringatan"); return; }
-      showToast("Tugas dikirim ke Antrian Evaluasi AI Engine (Gemini 1.5 Flash). Nilai akan ter-update otomatis.", "Submit Berhasil");
+      showToast("Tugas dikirim ke Antrian Evaluasi AI Engine. Nilai akan ter-update otomatis.", "Submit Berhasil");
       document.getElementById('taskAnswerText').value = '';
     }
 
@@ -972,6 +1303,14 @@
       selectedPertemuan = val;
       document.getElementById('currentPertemuanLabel').innerText = `Pertemuan ${val}`;
       document.getElementById('forumPertemuanTitle').innerText = `Pertemuan ${val}`;
+    }
+
+    function openYoutubeModal() {
+      showToast("Mengarahkan ke pemutar video YouTube...", "Video Pembelajaran");
+    }
+
+    function openBookLibraryModal() {
+      showToast("Membuka Reader PDF Pustaka Digital (Mode Read-Only / Non-Downloadable)...", "Buku Digital");
     }
   </script>
 </body>
