@@ -395,19 +395,27 @@
           userLng: pos.coords.longitude
         };
 
+        // JANGAN pakai mode:'no-cors' + Content-Type application/json.
+        // GAS tidak menangani preflight OPTIONS, dan no-cors membuat response jadi "opaque"
+        // sehingga .then() SELALU dianggap sukses walau server sebenarnya menolak/redirect login.
+        // text/plain menghindari preflight; tanpa no-cors kita bisa baca JSON asli dari GAS.
         fetch(GAS_WEB_APP_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         })
-        .then(() => {
-          showToast('Presensi Berhasil', `Absen Pertemuan ${meeting} berhasil dikirim ke Google Sheets!`, 'success');
+        .then(res => res.json())
+        .then(result => {
+          if (result.status === 'success') {
+            showToast('Presensi Berhasil', result.message || `Absen Pertemuan ${meeting} berhasil dikirim ke Google Sheets!`, 'success');
+          } else {
+            showToast('Gagal Tersimpan', result.message || 'Server menolak data presensi. Cek Apps Script Executions.', 'error');
+          }
           btn.disabled = false;
           btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
         })
         .catch(err => {
-          showToast('Gagal', 'Terjadi kesalahan koneksi.', 'error');
+          showToast('Gagal', 'Kesalahan koneksi/deployment GAS: ' + err.message, 'error');
           btn.disabled = false;
           btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
         });
@@ -445,18 +453,22 @@
 
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       })
-      .then(() => {
-        showToast('Tugas Terkirim', 'Jawaban berhasil dikirim dan masuk ke antrian tab Submissions Google Sheets!', 'success');
-        document.getElementById('taskAnswerText').value = '';
+      .then(res => res.json())
+      .then(result => {
+        if (result.status === 'success') {
+          showToast('Tugas Terkirim', result.message || 'Jawaban berhasil dikirim dan masuk ke antrian tab Submissions Google Sheets!', 'success');
+          document.getElementById('taskAnswerText').value = '';
+        } else {
+          showToast('Gagal Tersimpan', result.message || 'Server menolak tugas ini. Cek Apps Script Executions.', 'error');
+        }
         btn.disabled = false;
         btn.innerHTML = '<span>Kirim Tugas ke Antrian Evaluasi AI</span>';
       })
       .catch(err => {
-        showToast('Gagal', 'Terjadi kesalahan saat mengunggah tugas.', 'error');
+        showToast('Gagal', 'Kesalahan koneksi/deployment GAS: ' + err.message, 'error');
         btn.disabled = false;
         btn.innerHTML = '<span>Kirim Tugas ke Antrian Evaluasi AI</span>';
       });
