@@ -123,7 +123,7 @@
               <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 flex items-center justify-between">
                 <div>
                   <p class="text-xs text-blue-200 font-semibold uppercase tracking-wider">Total Kelas Diambil</p>
-                  <p class="text-3xl font-black text-amber-400 mt-1">11 <span class="text-lg font-bold text-white">Kelas</span></p>
+                  <p class="text-3xl font-black text-amber-400 mt-1" id="totalClassCountBanner">2 <span class="text-lg font-bold text-white">Kelas</span></p>
                   <p class="text-[11px] text-emerald-300 mt-0.5"><i class="fa-solid fa-circle-check"></i> Status Terdaftar Aktif</p>
                 </div>
                 <div class="w-14 h-14 bg-amber-400/20 rounded-xl flex items-center justify-center border border-amber-400/40 text-amber-300">
@@ -144,10 +144,10 @@
           <div>
             <div class="flex justify-between items-center mb-4">
               <div>
-                <h3 class="text-lg font-bold text-slate-900">Daftar 11 Kelas Perkuliahan Anda</h3>
+                <h3 class="text-lg font-bold text-slate-900" id="classCountHeading">Daftar Kelas Perkuliahan Anda</h3>
                 <p class="text-xs text-slate-500">Estimasi nilai akhir dihitung secara spesifik per Mata Kuliah.</p>
               </div>
-              <span class="text-xs text-blue-700 bg-blue-50 font-bold px-3 py-1 rounded-lg border border-blue-100">11 Kelas Aktif</span>
+              <span id="classCountBadge" class="text-xs text-blue-700 bg-blue-50 font-bold px-3 py-1 rounded-lg border border-blue-100">2 Kelas Aktif</span>
             </div>
 
             <div id="courseCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -772,9 +772,9 @@ Kunci: A</pre>
       document.getElementById('toastNotification').classList.add('hidden');
     }
 
-    function switchRole(role, name, idNumber, prodi = 'Manajemen') {
+    function switchRole(role, name, idNumber, prodi = 'Manajemen', kelas = 'ALL') {
       currentUserRole = role;
-      currentUser = { npm: idNumber, nama: name, role: role, prodi: prodi };
+      currentUser = { npm: idNumber, nama: name, role: role, prodi: prodi, kelas: kelas };
 
       if(role === 'student') {
         document.getElementById('roleBadge').innerText = "Mahasiswa";
@@ -794,7 +794,7 @@ Kunci: A</pre>
       const expectedPass = last4 + 'UMB';
       
       if (u === '19891231' && (p === 'DOSENUMB' || p === '19891231')) {
-        switchRole('lecturer', 'Andi Azhar', '19891231', 'Dosen');
+        switchRole('lecturer', 'Andi Azhar', '19891231', 'Dosen', 'ALL');
         document.getElementById('screenLogin').classList.add('hidden');
         document.getElementById('screenDashboard').classList.remove('hidden');
         populatePertemuanSelectors();
@@ -804,14 +804,23 @@ Kunci: A</pre>
         showToast("Selamat datang kembali, Andi Azhar!", "Login Dosen Berhasil");
         return true;
       } else if (p === expectedPass && u.length >= 6) {
-        switchRole('student', `Mahasiswa (${u})`, u, 'Manajemen');
+        // Fallback kelas untuk Meta Muthi'ah atau Mhs lainnya
+        let detectedKelas = 'VIIB';
+        let detectedNama = `Mahasiswa (${u})`;
+        
+        if (u === '2361201207') {
+          detectedNama = "meta muthi'ah";
+          detectedKelas = 'VIIB, VIIA';
+        }
+
+        switchRole('student', detectedNama, u, 'Manajemen', detectedKelas);
         document.getElementById('screenLogin').classList.add('hidden');
         document.getElementById('screenDashboard').classList.remove('hidden');
         populatePertemuanSelectors();
         populateLecturerClassDropdown();
         renderCourseCards();
         renderDashboardViews();
-        showToast("Selamat datang di Portal My-Courses!", "Login Mahasiswa Berhasil");
+        showToast(`Selamat datang, ${detectedNama}!`, "Login Mahasiswa Berhasil");
         return true;
       }
       return false;
@@ -833,7 +842,7 @@ Kunci: A</pre>
 
         if (res && res.status === 'success') {
           const role = res.user.role === 'lecturer' ? 'lecturer' : 'student';
-          switchRole(role, res.user.nama, res.user.npm || u, res.user.prodi || 'Manajemen');
+          switchRole(role, res.user.nama, res.user.npm || u, res.user.prodi || 'Manajemen', res.user.kelas || 'ALL');
           
           document.getElementById('screenLogin').classList.add('hidden');
           document.getElementById('screenDashboard').classList.remove('hidden');
@@ -903,7 +912,33 @@ Kunci: A</pre>
       const container = document.getElementById('courseCardsGrid');
       container.innerHTML = '';
 
-      all11Classes.forEach((c) => {
+      const rawKelas = (currentUser && currentUser.kelas) ? currentUser.kelas.toString() : 'ALL';
+      const userKelasList = rawKelas.split(',').map(k => k.trim().toUpperCase());
+
+      // Filter 11 MK berdasarkan Kelas Mahasiswa
+      const filteredClasses = all11Classes.filter(c => {
+        if (userKelasList.includes('ALL')) return true;
+        return userKelasList.includes(c.classRoom.toUpperCase()) || 
+               userKelasList.includes(c.code.toUpperCase()) ||
+               userKelasList.includes(c.id.toUpperCase());
+      });
+
+      const count = filteredClasses.length;
+      document.getElementById('totalClassCountBanner').innerHTML = `${count} <span class="text-lg font-bold text-white">Kelas</span>`;
+      document.getElementById('classCountBadge').innerText = `${count} Kelas Aktif`;
+      document.getElementById('classCountHeading').innerText = `Daftar ${count} Kelas Perkuliahan Anda`;
+
+      if (filteredClasses.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-3 bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+            <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i>
+            <p class="font-bold text-sm">Tidak ada kelas perkuliahan yang terdaftar untuk kode kelas Anda (${rawKelas}).</p>
+          </div>
+        `;
+        return;
+      }
+
+      filteredClasses.forEach((c) => {
         container.innerHTML += `
           <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between space-y-4">
             <div>
