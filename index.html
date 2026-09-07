@@ -105,7 +105,6 @@
           <span id="classBadgeCount" class="text-xs font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-100">0 Kelas</span>
         </div>
 
-        <!-- GRID KARTU MK DITERBITKAN DI SINI -->
         <div id="mkGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </div>
 
@@ -147,17 +146,15 @@
               <option value="15">Pertemuan 15</option>
               <option value="16">Pertemuan 16 (UAS)</option>
             </select>
-            <button onclick="submitPresensiGPS()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center space-x-2 text-sm">
+            <button onclick="submitPresensiGPS()" id="btnAbsen" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-200 transition flex items-center space-x-2 text-sm">
               <i class="fa-solid fa-location-dot"></i>
               <span>Absen GPS</span>
             </button>
           </div>
         </div>
 
-        <!-- Grid Fitur Pembelajaran (YouTube, PPT, Kuis, Buku) -->
+        <!-- Grid Fitur Pembelajaran -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          <!-- YouTube -->
           <a id="btnYT" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-red-400 hover:shadow-md transition group flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl group-hover:bg-red-600 group-hover:text-white transition">
               <i class="fa-brands fa-youtube"></i>
@@ -168,7 +165,6 @@
             </div>
           </a>
 
-          <!-- Slide PPT -->
           <a id="btnPPT" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-md transition group flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:bg-amber-600 group-hover:text-white transition">
               <i class="fa-solid fa-file-powerpoint"></i>
@@ -179,8 +175,7 @@
             </div>
           </a>
 
-          <!-- Kuis Safe Lock -->
-          <button onclick="launchQuizSafeLock()" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-purple-400 hover:shadow-md transition group flex items-center space-x-4 text-left">
+          <button onclick="showToast('Kuis Online', 'Fitur kuis dalam mode siap digunakan.')" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-purple-400 hover:shadow-md transition group flex items-center space-x-4 text-left">
             <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl group-hover:bg-purple-600 group-hover:text-white transition">
               <i class="fa-solid fa-pen-to-square"></i>
             </div>
@@ -190,8 +185,7 @@
             </div>
           </button>
 
-          <!-- Buku Reader -->
-          <button onclick="openBookReader()" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-indigo-400 hover:shadow-md transition group flex items-center space-x-4 text-left">
+          <button onclick="showToast('Buku Digital', 'Membuka reader dokumen PDF...')" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-indigo-400 hover:shadow-md transition group flex items-center space-x-4 text-left">
             <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition">
               <i class="fa-solid fa-book-open"></i>
             </div>
@@ -200,13 +194,10 @@
               <p class="text-xs text-slate-500">Protected Viewer</p>
             </div>
           </button>
-
         </div>
 
-        <!-- Submissions & Forum Discussion -->
+        <!-- Submissions & Forum -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          <!-- Form Submit Tugas -->
           <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
               <i class="fa-solid fa-upload text-indigo-600"></i>
@@ -215,31 +206,23 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Tipe Tugas</label>
-              <select id="taskTypeSelect" onchange="toggleGroupPBL(this.value)" class="w-full bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none">
+              <select id="taskTypeSelect" class="w-full bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none">
                 <option value="individu">Tugas Mandiri (Individu)</option>
                 <option value="kelompok">Tugas Kelompok (PBL)</option>
               </select>
             </div>
 
-            <div id="pblSection" class="hidden space-y-2">
-              <label class="block text-xs font-bold text-slate-600 uppercase">Pilih Anggota Kelompok</label>
-              <select id="groupMembers" multiple class="w-full bg-slate-50 border border-slate-200 text-xs font-medium rounded-xl p-3 h-28">
-                <!-- Diisi via JS -->
-              </select>
-              <p class="text-[11px] text-slate-400">Tekan Ctrl / Cmd untuk memilih lebih dari 1 anggota.</p>
-            </div>
-
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Isi Jawaban / Link Laporan</label>
-              <textarea id="taskAnswerText" rows="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Tuliskan teks rangkuman atau tempelkan link Google Drive / tugas kelompok di sini..."></textarea>
+              <textarea id="taskAnswerText" rows="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Tuliskan teks rangkuman atau tempelkan link Google Drive di sini..."></textarea>
             </div>
 
-            <button onclick="submitAssignmentToQueue()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition text-sm">
-              Kirim Tugas ke Antrian Evaluasi AI
+            <button onclick="submitAssignmentToQueue()" id="btnSubmitTask" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2">
+              <span>Kirim Tugas ke Antrian Evaluasi AI</span>
             </button>
           </div>
 
-          <!-- Forum Diskusi Terstruktur -->
+          <!-- Forum Pemantik -->
           <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
             <div>
               <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
@@ -251,11 +234,10 @@
                 <p class="text-xs text-indigo-800 mt-1 leading-relaxed">"Bagaimana strategi optimal dalam melakukan riset pasar digital untuk produk UMKM daerah Bengkulu?"</p>
               </div>
 
-              <!-- Thread Komentar -->
               <div id="forumThreads" class="space-y-3 max-h-48 overflow-y-auto pr-1">
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
                   <p class="font-bold text-slate-800">Ahmad Rizky Pratama <span class="text-[10px] text-slate-400 font-normal">• 10 menit lalu</span></p>
-                  <p class="text-slate-600 mt-1">Menurut saya penggunaan Google Trends sangat penting untuk mengamati tren pencarian lokal.</p>
+                  <p class="text-slate-600 mt-1">Penggunaan Google Trends sangat penting untuk mengamati tren pencarian lokal.</p>
                 </div>
               </div>
             </div>
@@ -276,7 +258,9 @@
   </div>
 
   <script>
-    // DATA MASTER MK BAPAK ANDI AZHAR (11 KELAS)
+    // SCRIPT WEB APP UTAMA
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx14e8uXX5JALbPJMuBRTaPuXJ1LXmxb8biivT9_ZPjQfcPp3TcDS6PglAInG9hq10tcQ/exec';
+
     const ALL_COURSES = [
       { id: 'MK01', kode: 'MKP6120123005', nama: 'SEMINAR PEMASARAN', sks: '3 SKS', kelas: 'VIIB', jadwal: 'Senin, 10:00 - 12:00 WIB', room: 'Ruang VIIB', yt: 'dQw4w9WgXcQ', ppt: 'https://drive.google.com' },
       { id: 'MK02', kode: 'UMB7420123008', nama: 'Kewirausahaan Berbasis PKM', sks: '2 SKS', kelas: '3C', jadwal: 'Senin, 13:05 - 14:05 WIB', room: 'Ruang 3C', yt: 'dQw4w9WgXcQ', ppt: 'https://drive.google.com' },
@@ -294,7 +278,6 @@
     let currentUser = null;
     let activeMK = null;
 
-    // Toast Notification
     function showToast(title, message, type = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -307,7 +290,6 @@
 
     function closeModal() { document.getElementById('customModal').classList.add('hidden'); }
 
-    // LOGIN PROCESS
     function handleLogin() {
       const npm = document.getElementById('npm').value.trim();
       const pass = document.getElementById('pass').value.trim();
@@ -317,12 +299,11 @@
         return;
       }
 
-      // Simulasi / Panggilan Auth
       currentUser = {
         npm: npm,
         nama: npm === '2361201207' ? 'Meta Muthi\'ah' : 'Mahasiswa',
         prodi: 'Manajemen',
-        kelas: npm === '2361201207' ? ['VIIB', 'VIIA'] : ['VIIB'], // Array kelas yang diambil
+        kelas: npm === '2361201207' ? ['VIIB', 'VIIA'] : ['VIIB'],
         role: npm === '19891231' ? 'lecturer' : 'student'
       };
 
@@ -336,12 +317,10 @@
       loadDashboard();
     }
 
-    // PEMBUATAN DAFTAR KARTU MK
     function loadDashboard() {
       const mkGrid = document.getElementById('mkGrid');
       mkGrid.innerHTML = '';
 
-      // Filter MK yang HANYA diambil oleh mahasiswa bersangkutan
       const userCourses = ALL_COURSES.filter(c => currentUser.kelas.includes(c.kelas));
 
       document.getElementById('classBadgeCount').innerText = `${userCourses.length} Kelas`;
@@ -373,7 +352,6 @@
       });
     }
 
-    // KETIKA KARTU MK DIKLIK
     function openCourseDetail(courseId) {
       activeMK = ALL_COURSES.find(c => c.id === courseId);
       
@@ -396,23 +374,92 @@
     }
 
     function submitPresensiGPS() {
-      showToast('GPS Presensi', 'Memeriksa lokasi koordinat Anda dengan lokasi kelas...');
-      setTimeout(() => {
-        showToast('Presensi Berhasil', 'Kehadiran Anda berhasil dicatat!', 'success');
-      }, 1500);
-    }
+      const btn = document.getElementById('btnAbsen');
+      const meeting = document.getElementById('meetingSelect').value;
 
-    function toggleGroupPBL(val) {
-      const sec = document.getElementById('pblSection');
-      if (val === 'kelompok') sec.classList.remove('hidden');
-      else sec.classList.add('hidden');
+      if (!navigator.geolocation) {
+        showToast('Error GPS', 'Browser Anda tidak mendukung lokasi Geolocation.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Mengecek Lokasi...</span>';
+
+      navigator.geolocation.getCurrentPosition(pos => {
+        const payload = {
+          action: 'submitPresensi',
+          npm: currentUser.npm,
+          courseId: activeMK.id,
+          meeting: meeting,
+          userLat: pos.coords.latitude,
+          userLng: pos.coords.longitude
+        };
+
+        fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(() => {
+          showToast('Presensi Berhasil', `Absen Pertemuan ${meeting} berhasil dikirim ke Google Sheets!`, 'success');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
+        })
+        .catch(err => {
+          showToast('Gagal', 'Terjadi kesalahan koneksi.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
+        });
+
+      }, err => {
+        showToast('Izin GPS Ditolak', 'Aktifkan/Izinkan akses lokasi GPS pada browser Anda.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
+      });
     }
 
     function submitAssignmentToQueue() {
-      const ans = document.getElementById('taskAnswerText').value;
-      if (!ans) return showToast('Peringatan', 'Isi jawaban tugas Anda!', 'error');
-      showToast('Tugas Terkirim', 'Tugas masuk ke antrian penilaian AI otomatis.', 'success');
-      document.getElementById('taskAnswerText').value = '';
+      const ans = document.getElementById('taskAnswerText').value.trim();
+      const taskType = document.getElementById('taskTypeSelect').value;
+      const meeting = document.getElementById('meetingSelect').value;
+      const btn = document.getElementById('btnSubmitTask');
+
+      if (!ans) {
+        showToast('Peringatan', 'Tuliskan jawaban atau masukkan link tugas!', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Mengirim Tugas...</span>';
+
+      const payload = {
+        action: 'submitAssignment',
+        npm: currentUser.npm,
+        taskId: `TASK_M${meeting}`,
+        courseId: activeMK.id,
+        meeting: meeting,
+        answer: ans,
+        isGroup: taskType === 'kelompok'
+      };
+
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        showToast('Tugas Terkirim', 'Jawaban berhasil dikirim dan masuk ke antrian tab Submissions Google Sheets!', 'success');
+        document.getElementById('taskAnswerText').value = '';
+        btn.disabled = false;
+        btn.innerHTML = '<span>Kirim Tugas ke Antrian Evaluasi AI</span>';
+      })
+      .catch(err => {
+        showToast('Gagal', 'Terjadi kesalahan saat mengunggah tugas.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Kirim Tugas ke Antrian Evaluasi AI</span>';
+      });
     }
 
     function postForumComment() {
@@ -426,14 +473,6 @@
         </div>
       `;
       document.getElementById('forumInput').value = '';
-    }
-
-    function launchQuizSafeLock() {
-      showToast('Safe Lock Browser', 'Memulai modul kuis dalam mode ujian terkunci...', 'info');
-    }
-
-    function openBookReader() {
-      showToast('Buku Digital', 'Membuka dokumen perpustakaan digital protected reader...', 'info');
     }
   </script>
 </body>
