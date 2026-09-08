@@ -32,7 +32,7 @@
     // di file yg ter-cache. Kalau browser seseorang masih memegang versi index.html yang
     // BELUM punya skrip ini sama sekali, kunjungan itu tetap perlu 1x hard refresh manual --
     // setelah itu, semua update berikutnya akan otomatis.
-    window.BUILD_VERSION = '2026-09-08-01';
+    window.BUILD_VERSION = '2026-09-08-02';
     (function () {
       try {
         fetch(location.pathname + '?_cachebust=' + Date.now(), { cache: 'no-store' })
@@ -141,107 +141,11 @@
         <div class="flex justify-between items-center flex-wrap gap-3">
           <h3 class="text-xl font-bold text-slate-900">Daftar Kelas Perkuliahan Anda</h3>
           <div class="flex items-center gap-3">
-            <button id="btnPanelDosen" onclick="showDosenPanel()" class="hidden text-xs font-bold bg-slate-900 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl transition flex items-center space-x-2">
-              <i class="fa-solid fa-chalkboard-user"></i><span>Panel Dosen</span>
-            </button>
             <span id="classBadgeCount" class="text-xs font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-100">0 Kelas</span>
           </div>
         </div>
 
         <div id="mkGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </div>
-
-      <!-- TAMPILAN DOSEN: PENGATURAN KELAS + REKAP NILAI -->
-      <div id="dosenPanelSection" class="hidden space-y-6">
-        <button onclick="hideDosenPanel()" class="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-800 font-bold text-sm bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm transition">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span>Kembali ke Daftar Kelas</span>
-        </button>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
-            <i class="fa-solid fa-location-crosshairs text-indigo-600"></i>
-            <span>Lokasi Default &amp; Mode UTS/UAS per Kelas</span>
-          </h3>
-          <p class="text-xs text-slate-500 -mt-2">Lokasi di sini cuma DEFAULT/fallback kelas. Kalau suatu pertemuan pindah gedung atau jadi online, atur khusus lewat "Materi & Lokasi Presensi" saat membuka kelas itu di pertemuan bersangkutan -- itu akan menimpa default ini. Kalau default dan pengaturan per-pertemuan sama-sama kosong, presensi pertemuan itu ditolak otomatis.</p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs">
-              <thead>
-                <tr class="text-left text-slate-500 uppercase border-b">
-                  <th class="py-2 pr-3">Mata Kuliah / Kelas</th>
-                  <th class="py-2 pr-3">Lokasi Default</th>
-                  <th class="py-2 pr-3">Mode UTS (P.8)</th>
-                  <th class="py-2 pr-3">Mode UAS (P.16)</th>
-                  <th class="py-2 pr-3"></th>
-                </tr>
-              </thead>
-              <tbody id="dosenSettingsBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
-            <i class="fa-solid fa-table-list text-indigo-600"></i>
-            <span>Rekap Nilai per Kelas (untuk dipindahkan ke SIKAMU)</span>
-          </h3>
-          <div class="flex flex-wrap items-center gap-3">
-            <select id="rekapCourseSelect" class="bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none flex-1 min-w-[220px]"></select>
-            <button onclick="loadRekapKelas()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">Tampilkan Rekap</button>
-          </div>
-          <p class="text-[11px] text-slate-400">Kolom Kuis, Forum, UTS, UAS akan otomatis muncul di sini begitu fitur-fitur itu dibangun. Untuk sekarang: Tugas Individu, PBL, dan Kehadiran.</p>
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs">
-              <thead>
-                <tr class="text-left text-slate-500 uppercase border-b">
-                  <th class="py-2 pr-3">NPM</th>
-                  <th class="py-2 pr-3">Nama</th>
-                  <th class="py-2 pr-3">Rata2 Tugas</th>
-                  <th class="py-2 pr-3">Jml Tugas</th>
-                  <th class="py-2 pr-3">Rata2 PBL</th>
-                  <th class="py-2 pr-3">Jml PBL</th>
-                  <th class="py-2 pr-3">Kehadiran</th>
-                </tr>
-              </thead>
-              <tbody id="rekapBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
-            <i class="fa-solid fa-robot text-indigo-600"></i>
-            <span>Kuis Online (Soal Digenerate AI)</span>
-          </h3>
-          <p class="text-xs text-slate-500 -mt-2">
-            Catatan jujur: ini "soft lock" (deteksi pindah tab/keluar fullscreen via browser), <b>bukan</b> aplikasi proctoring khusus seperti Safe Exam Browser/LockDown Browser yang benar-benar mengunci OS. Mahasiswa yang benar-benar nekat (mis. pakai HP kedua) tidak bisa dicegah dari halaman web biasa.
-          </p>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <select id="quizCourseSelect" onchange="loadQuizSettingForm()" class="bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none"></select>
-            <select id="quizMeetingSelect" onchange="loadQuizSettingForm()" class="bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none"></select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Topik / Materi untuk Pertemuan Ini</label>
-            <textarea id="quizTopik" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Contoh: Strategi segmentasi pasar dan positioning produk UMKM digital..."></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 items-end">
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Jumlah Soal</label>
-              <input type="number" id="quizJumlahSoal" value="10" min="1" max="50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Durasi (menit)</label>
-              <input type="number" id="quizDurasi" value="20" min="1" max="180" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none">
-            </div>
-            <button onclick="generateQuizSoal()" id="btnGenerateQuiz" class="col-span-2 md:col-span-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">Generate Soal (AI)</button>
-            <button onclick="toggleQuizAktif()" id="btnToggleQuiz" class="col-span-2 md:col-span-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition">Aktifkan Kuis</button>
-          </div>
-
-          <p id="quizStatusText" class="text-xs font-semibold text-slate-500">Pilih kelas &amp; pertemuan untuk melihat status kuis.</p>
-        </div>
       </div>
 
       <!-- OVERLAY: MODAL MENGERJAKAN KUIS (SISWA) -->
@@ -307,19 +211,51 @@
           </div>
         </div>
 
-        <!-- Notice khusus dosen: kelas ini dilihat sebagai pengajar. Pengaturan per-pertemuan
-             (materi, lokasi, forum) ada langsung di bawah; yang bersifat kelas-wide (mode
-             UTS/UAS, generate kuis, rekap nilai SIKAMU) tetap di Panel Dosen. -->
-        <div id="lecturerCourseNotice" class="hidden bg-indigo-600 text-white p-5 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div>
-            <p class="font-bold text-sm">Anda melihat kelas ini sebagai Dosen</p>
-            <p class="text-xs text-indigo-100 mt-1">Atur materi, lokasi presensi, dan forum pertemuan ini di bawah. Untuk mode UTS/UAS, generate kuis, atau rekap nilai kelas (gaya SIKAMU), gunakan Panel Dosen.</p>
-          </div>
-          <button onclick="showDosenPanel()" class="shrink-0 bg-white text-indigo-700 font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-indigo-50 transition">Buka Panel Dosen</button>
+        <!-- Notice khusus dosen: kelas ini dilihat sebagai pengajar. SEMUA pengaturan (materi,
+             lokasi, forum, UTS/UAS, kuis, rekap nilai) ada di satu layar ini -- tidak ada lagi
+             panel/layar terpisah. -->
+        <div id="lecturerCourseNotice" class="hidden bg-indigo-600 text-white p-4 rounded-2xl shadow-sm">
+          <p class="font-bold text-sm">Anda mengelola kelas ini sebagai Dosen -- semua pengaturan ada di bawah.</p>
         </div>
 
-        <!-- DOSEN: kelola materi + lokasi presensi + forum utk kelas & pertemuan yang dipilih -->
+        <!-- DOSEN: SATU layar utk kelola pengaturan kelas, materi/lokasi/forum per pertemuan,
+             kuis online, dan rekap nilai -- semua utk kelas (activeMK) yg sedang dibuka. -->
         <div id="lecturerMeetingPanel" class="hidden space-y-6">
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-location-crosshairs text-indigo-600"></i><span>Pengaturan Kelas Ini</span>
+            </h3>
+            <p class="text-xs text-slate-500 -mt-2">Lokasi di sini cuma DEFAULT/fallback -- kalau pertemuan tertentu pindah gedung/jadi online, atur khusus lewat "Materi & Lokasi Presensi" di bawah (menimpa default ini).</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Lokasi Default Kelas</label>
+                <select id="courseLokasiDefault" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none">
+                  <option value="">- tidak ada default -</option>
+                  <option value="AD">UMB Gedung AD</option>
+                  <option value="HD">UMB Gedung HD</option>
+                  <option value="SMK">UMB Gedung SMK</option>
+                  <option value="POLTEKKES">Poltekkes Kemenkes Bengkulu</option>
+                  <option value="DARING">Daring (bebas lokasi)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Mode UTS (Pertemuan 8)</label>
+                <select id="courseUtsMode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none">
+                  <option value="Submission">Submit Tugas/Laporan</option>
+                  <option value="Kuis">Ujian Online (Kuis)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Mode UAS (Pertemuan 16)</label>
+                <select id="courseUasMode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none">
+                  <option value="Submission">Submit Tugas/Laporan</option>
+                  <option value="Kuis">Ujian Online (Kuis)</option>
+                </select>
+              </div>
+            </div>
+            <button onclick="saveCourseSettingForm()" id="btnSaveCourseSetting" class="w-full md:w-auto bg-slate-900 hover:bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl transition text-sm">Simpan Pengaturan Kelas</button>
+          </div>
+
           <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
               <i class="fa-solid fa-sliders text-indigo-600"></i><span>Materi & Lokasi Presensi -- Pertemuan Ini</span>
@@ -366,6 +302,58 @@
             <div class="pt-3 border-t">
               <p class="text-xs font-bold text-slate-600 uppercase mb-2">Pantau Diskusi (<span id="lecForumCommentCount">0</span> komentar)</p>
               <div id="lecForumComments" class="space-y-2 max-h-64 overflow-y-auto pr-1 text-xs text-slate-500">Belum ada kasus forum utk pertemuan ini.</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+              <i class="fa-solid fa-robot text-indigo-600"></i><span>Kuis Online -- Pertemuan Ini (Soal Digenerate AI)</span>
+            </h3>
+            <p class="text-xs text-slate-500 -mt-2">
+              Catatan jujur: ini "soft lock" (deteksi pindah tab/keluar fullscreen via browser), <b>bukan</b> aplikasi proctoring khusus seperti Safe Exam Browser/LockDown Browser yang benar-benar mengunci OS.
+            </p>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Topik / Materi untuk Pertemuan Ini</label>
+              <textarea id="quizTopik" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Contoh: Strategi segmentasi pasar dan positioning produk UMKM digital..."></textarea>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 items-end">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Jumlah Soal</label>
+                <input type="number" id="quizJumlahSoal" value="10" min="1" max="50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Durasi (menit)</label>
+                <input type="number" id="quizDurasi" value="20" min="1" max="180" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none">
+              </div>
+              <button onclick="generateQuizSoal()" id="btnGenerateQuiz" class="col-span-2 md:col-span-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">Generate Soal (AI)</button>
+              <button onclick="toggleQuizAktif()" id="btnToggleQuiz" class="col-span-2 md:col-span-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition">Aktifkan Kuis</button>
+            </div>
+            <p id="quizStatusText" class="text-xs font-semibold text-slate-500">Memuat status kuis...</p>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
+              <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
+                <i class="fa-solid fa-table-list text-indigo-600"></i><span>Rekap Nilai Kelas Ini (untuk dipindahkan ke SIKAMU)</span>
+              </h3>
+              <button onclick="loadRekapKelas()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Refresh Rekap</button>
+            </div>
+            <p class="text-[11px] text-slate-400 -mt-2">Kolom Kuis, Forum, UTS, UAS akan otomatis muncul di sini begitu fitur-fitur itu dibangun. Untuk sekarang: Tugas Individu, PBL, dan Kehadiran.</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-left text-slate-500 uppercase border-b">
+                    <th class="py-2 pr-3">NPM</th>
+                    <th class="py-2 pr-3">Nama</th>
+                    <th class="py-2 pr-3">Rata2 Tugas</th>
+                    <th class="py-2 pr-3">Jml Tugas</th>
+                    <th class="py-2 pr-3">Rata2 PBL</th>
+                    <th class="py-2 pr-3">Jml PBL</th>
+                    <th class="py-2 pr-3">Kehadiran</th>
+                  </tr>
+                </thead>
+                <tbody id="rekapBody"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -567,7 +555,6 @@
         document.getElementById('userSub').innerText = `NPM: ${currentUser.npm} • Prodi ${currentUser.prodi}`;
         document.getElementById('bannerUser').innerText = currentUser.nama;
         document.getElementById('roleBadge').innerText = currentUser.role === 'lecturer' ? 'Dosen' : 'Mahasiswa';
-        document.getElementById('btnPanelDosen').classList.toggle('hidden', currentUser.role !== 'lecturer');
 
         loadDashboard();
       })
@@ -643,6 +630,11 @@
 
       if (!isLecturer) {
         loadKotakNilai();
+      } else {
+        // Pengaturan kelas (lokasi default + mode UTS/UAS) & rekap nilai SIKAMU sifatnya
+        // sekali per-kelas, bukan per-pertemuan -- cukup dimuat sekali saat kelas dibuka.
+        loadCourseSettingForm();
+        loadRekapKelas();
       }
 
       onMeetingChange();
@@ -803,6 +795,7 @@
       .catch(() => {});
 
       loadLecturerForumPanel(courseId, meeting);
+      loadQuizSettingForm();
     }
 
     function saveLecturerMeetingContent() {
@@ -961,33 +954,15 @@
       AD: 'UMB Gedung AD', HD: 'UMB Gedung HD', SMK: 'UMB Gedung SMK', POLTEKKES: 'Poltekkes Kemenkes Bengkulu', DARING: 'Daring (bebas lokasi)'
     };
 
-    function showDosenPanel() {
-      document.getElementById('courseListSection').classList.add('hidden');
-      document.getElementById('dosenPanelSection').classList.remove('hidden');
-      loadDosenSettings();
-      populateRekapCourseSelect();
-      populateQuizSelectors();
-    }
-
-    function hideDosenPanel() {
-      document.getElementById('dosenPanelSection').classList.add('hidden');
-      document.getElementById('courseListSection').classList.remove('hidden');
-    }
-
     // Dosen dengan kelas 'ALL' mengelola semua MK; kalau tidak, hanya MK di kelasnya sendiri.
+    // (Dipakai loadDashboard() utk grid kartu MK yg diampu dosen.)
     function dosenCourses() {
       return currentUser.kelas === 'ALL' ? ALL_COURSES : ALL_COURSES.filter(c => currentUser.kelas.includes(c.kelas));
     }
 
-    function populateRekapCourseSelect() {
-      const sel = document.getElementById('rekapCourseSelect');
-      sel.innerHTML = dosenCourses().map(c => `<option value="${c.id}">${c.nama} - ${c.kelas}</option>`).join('');
-    }
-
-    function loadDosenSettings() {
-      const body = document.getElementById('dosenSettingsBody');
-      body.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400">Memuat...</td></tr>`;
-
+    // ===== DOSEN: Pengaturan Kelas Ini (lokasi default + mode UTS/UAS) -- utk activeMK saja,
+    // dipanggil sekali saat kelas dibuka (bukan per-pertemuan, jadi tidak di onMeetingChange). =====
+    function loadCourseSettingForm() {
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -995,71 +970,43 @@
       })
       .then(res => res.json())
       .then(result => {
-        if (result.status !== 'success') {
-          body.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500">${result.message}</td></tr>`;
-          return;
-        }
-        const settings = result.settings || {};
-        body.innerHTML = dosenCourses().map(c => {
-          const s = settings[c.id] || {};
-          const locOptions = ['', 'AD', 'HD', 'SMK', 'POLTEKKES', 'DARING'].map(key =>
-            `<option value="${key}" ${s.lokasi === key ? 'selected' : ''}>${key ? (LOCATION_LABELS[key] || key) : '- tidak ada default -'}</option>`
-          ).join('');
-          const modeOptions = (current) => ['Submission', 'Kuis'].map(m =>
-            `<option value="${m}" ${current === m ? 'selected' : ''}>${m === 'Submission' ? 'Submit Tugas/Laporan' : 'Ujian Online (Kuis)'}</option>`
-          ).join('');
-
-          return `
-            <tr class="border-b border-slate-50" data-course-id="${c.id}">
-              <td class="py-2 pr-3 font-semibold text-slate-800">${c.nama}<br><span class="text-slate-400 font-normal">${c.kelas}</span></td>
-              <td class="py-2 pr-3"><select class="set-lokasi bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs">${locOptions}</select></td>
-              <td class="py-2 pr-3"><select class="set-uts bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs">${modeOptions(s.utsMode || 'Submission')}</select></td>
-              <td class="py-2 pr-3"><select class="set-uas bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs">${modeOptions(s.uasMode || 'Submission')}</select></td>
-              <td class="py-2 pr-3"><button onclick="saveDosenSetting('${c.id}', this)" class="bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">Simpan</button></td>
-            </tr>`;
-        }).join('');
+        if (result.status !== 'success') return;
+        const s = (result.settings || {})[activeMK.id] || {};
+        document.getElementById('courseLokasiDefault').value = s.lokasi || '';
+        document.getElementById('courseUtsMode').value = s.utsMode || 'Submission';
+        document.getElementById('courseUasMode').value = s.uasMode || 'Submission';
       })
-      .catch(err => {
-        body.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
-      });
+      .catch(() => {});
     }
 
-    function saveDosenSetting(courseId, btnEl) {
-      const row = btnEl.closest('tr');
-      const lokasi = row.querySelector('.set-lokasi').value;
-      const utsMode = row.querySelector('.set-uts').value;
-      const uasMode = row.querySelector('.set-uas').value;
-
-      // Lokasi di sini opsional -- kalau kosong, presensi mengikuti pengaturan per pertemuan
-      // (menu "Materi & Lokasi Presensi" saat dosen membuka kelas). Kalau keduanya kosong,
-      // presensi pertemuan itu akan ditolak dengan pesan jelas.
-      btnEl.disabled = true;
-      btnEl.innerText = '...';
+    function saveCourseSettingForm() {
+      const lokasi = document.getElementById('courseLokasiDefault').value;
+      const utsMode = document.getElementById('courseUtsMode').value;
+      const uasMode = document.getElementById('courseUasMode').value;
+      const btn = document.getElementById('btnSaveCourseSetting');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
 
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'saveCourseSetting', courseId, lokasi, utsMode, uasMode })
+        body: JSON.stringify({ action: 'saveCourseSetting', courseId: activeMK.id, lokasi, utsMode, uasMode })
       })
       .then(res => res.json())
       .then(result => {
-        if (result.status === 'success') {
-          showToast('Tersimpan', 'Pengaturan kelas berhasil disimpan.', 'success');
-        } else {
-          showToast('Gagal', result.message || 'Tidak bisa menyimpan pengaturan.', 'error');
-        }
-        btnEl.disabled = false;
-        btnEl.innerText = 'Simpan';
+        showToast(result.status === 'success' ? 'Tersimpan' : 'Gagal', result.message || (result.status === 'success' ? 'Pengaturan kelas berhasil disimpan.' : 'Tidak bisa menyimpan.'), result.status === 'success' ? 'success' : 'error');
+        btn.disabled = false;
+        btn.innerText = 'Simpan Pengaturan Kelas';
       })
       .catch(err => {
         showToast('Gagal', 'Kesalahan koneksi: ' + err.message, 'error');
-        btnEl.disabled = false;
-        btnEl.innerText = 'Simpan';
+        btn.disabled = false;
+        btn.innerText = 'Simpan Pengaturan Kelas';
       });
     }
 
     function loadRekapKelas() {
-      const courseId = document.getElementById('rekapCourseSelect').value;
+      const courseId = activeMK.id;
       const body = document.getElementById('rekapBody');
       body.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-400">Memuat...</td></tr>`;
 
@@ -1094,22 +1041,11 @@
       });
     }
 
-    // ===== KUIS ONLINE -- SISI DOSEN (generate soal AI + on/off) =====
-    function populateQuizSelectors() {
-      const courseSel = document.getElementById('quizCourseSelect');
-      courseSel.innerHTML = dosenCourses().map(c => `<option value="${c.id}">${c.nama} - ${c.kelas}</option>`).join('');
-
-      const meetingSel = document.getElementById('quizMeetingSelect');
-      meetingSel.innerHTML = Array.from({ length: 16 }, (_, i) => i + 1)
-        .map(m => `<option value="${m}">Pertemuan ${m}${m === 8 ? ' (UTS)' : m === 16 ? ' (UAS)' : ''}</option>`).join('');
-
-      loadQuizSettingForm();
-    }
-
+    // ===== KUIS ONLINE -- SISI DOSEN (generate soal AI + on/off) -- utk activeMK + pertemuan
+    // yg sedang dipilih di meetingSelect (dipanggil ulang tiap ganti pertemuan). =====
     function loadQuizSettingForm() {
-      const courseId = document.getElementById('quizCourseSelect').value;
-      const meeting = document.getElementById('quizMeetingSelect').value;
-      if (!courseId || !meeting) return;
+      const courseId = activeMK.id;
+      const meeting = document.getElementById('meetingSelect').value;
 
       document.getElementById('quizStatusText').innerText = 'Memuat status kuis...';
 
@@ -1146,8 +1082,8 @@
     }
 
     function generateQuizSoal() {
-      const courseId = document.getElementById('quizCourseSelect').value;
-      const meeting = document.getElementById('quizMeetingSelect').value;
+      const courseId = activeMK.id;
+      const meeting = document.getElementById('meetingSelect').value;
       const topik = document.getElementById('quizTopik').value.trim();
       const jumlahSoal = document.getElementById('quizJumlahSoal').value;
       const durasiMenit = document.getElementById('quizDurasi').value;
@@ -1185,8 +1121,8 @@
     }
 
     function toggleQuizAktif() {
-      const courseId = document.getElementById('quizCourseSelect').value;
-      const meeting = document.getElementById('quizMeetingSelect').value;
+      const courseId = activeMK.id;
+      const meeting = document.getElementById('meetingSelect').value;
       const aktifSekarang = document.getElementById('btnToggleQuiz').innerText.indexOf('Nonaktifkan') === 0;
 
       fetch(GAS_WEB_APP_URL, {
