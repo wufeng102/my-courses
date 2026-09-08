@@ -32,7 +32,7 @@
     // di file yg ter-cache. Kalau browser seseorang masih memegang versi index.html yang
     // BELUM punya skrip ini sama sekali, kunjungan itu tetap perlu 1x hard refresh manual --
     // setelah itu, semua update berikutnya akan otomatis.
-    window.BUILD_VERSION = '2026-09-08-03';
+    window.BUILD_VERSION = '2026-09-08-04';
     (function () {
       try {
         fetch(location.pathname + '?_cachebust=' + Date.now(), { cache: 'no-store' })
@@ -227,8 +227,8 @@
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">URL YouTube</label>
-                <input id="lecYoutube" type="text" placeholder="https://youtube.com/watch?v=..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600">
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Video YouTube (ID atau link, keduanya bisa)</label>
+                <input id="lecYoutube" type="text" placeholder="cth: dQw4w9WgXcQ (atau tempel link lengkap)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600">
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Link PPT (Drive/Dropbox)</label>
@@ -354,15 +354,15 @@
         <!-- Grid Fitur Pembelajaran (khusus tampilan mahasiswa -- dosen mengatur link yang sama
              lewat form "Materi & Lokasi Presensi" di atas, tidak perlu lihat preview kartu ini) -->
         <div id="fiturPembelajaranGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <a id="btnYT" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-red-400 hover:shadow-md transition group flex items-center space-x-4">
+          <button type="button" id="btnYT" onclick="playYoutubeInline()" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-red-400 hover:shadow-md transition group flex items-center space-x-4 text-left w-full">
             <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl group-hover:bg-red-600 group-hover:text-white transition">
               <i class="fa-brands fa-youtube"></i>
             </div>
             <div>
               <h4 class="font-bold text-sm text-slate-900">Materi Video</h4>
-              <p class="text-xs text-slate-500">Tonton di YouTube</p>
+              <p class="text-xs text-slate-500">Putar langsung di sini</p>
             </div>
-          </a>
+          </button>
 
           <a id="btnPPT" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-md transition group flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:bg-amber-600 group-hover:text-white transition">
@@ -393,6 +393,13 @@
               <p id="btnPDFSub" class="text-xs text-slate-500">Belum diatur dosen</p>
             </div>
           </a>
+        </div>
+
+        <!-- Pemutar YouTube inline -- diputar langsung di halaman ini, TIDAK membuka
+             aplikasi/tab YouTube. Muncul saat mahasiswa klik kartu "Materi Video" di atas. -->
+        <div id="ytPlayerBox" class="hidden bg-black rounded-2xl overflow-hidden shadow-lg" style="aspect-ratio:16/9">
+          <iframe id="ytPlayerFrame" class="w-full h-full" src="" title="Materi Video" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
         <!-- Submissions & Forum (khusus tampilan mahasiswa) -->
@@ -550,10 +557,9 @@
       const mkGrid = document.getElementById('mkGrid');
       mkGrid.innerHTML = '';
 
-      // 'ALL' (biasanya dosen) -> tampilkan semua kelas. Selain itu, filter sesuai kelas user.
-      const userCourses = currentUser.kelas === 'ALL'
-        ? ALL_COURSES
-        : ALL_COURSES.filter(c => currentUser.kelas.includes(c.kelas));
+      // 'ALL' (biasanya dosen) -> tampilkan semua kelas. Selain itu, filter sesuai kelas user
+      // (lihat getUserCourses_ -- match PERSIS per kelas, bukan substring).
+      const userCourses = getUserCourses_();
 
       document.getElementById('classBadgeCount').innerText = `${userCourses.length} Kelas`;
       document.getElementById('totalClassCountText').innerText = `${userCourses.length} Kelas Aktif`;
@@ -587,6 +593,7 @@
       });
     }
 
+    let currentMeetingYoutube = ''; // ID/URL YouTube materi pertemuan yg sedang dibuka mahasiswa
     let replyToCommentId = ''; // diisi kalau mahasiswa lagi membalas komentar tertentu di forum
     let lastUsedLokasi = ''; // lokasi terakhir yg disimpan dosen di kelas ini, dipakai sbg
                               // pra-isi utk pertemuan lain yg belum diatur -- supaya tidak
@@ -682,26 +689,75 @@
       return topLevel.map(c => renderOne(c, false)).join('');
     }
 
+    // Dosen biasanya cuma salin ID video (bukan link lengkap) -- fungsi ini menerima ID mentah
+    // ATAU berbagai format link YouTube (watch?v=, youtu.be/, embed/, shorts/) dan mengembalikan
+    // ID 11-karakternya saja, supaya bisa dipakai sebagai src iframe pemutar inline.
+    function extractYoutubeId_(raw) {
+      if (!raw) return '';
+      const s = String(raw).trim();
+      const patterns = [
+        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/(?:watch\?v=|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/
+      ];
+      for (const p of patterns) {
+        const m = s.match(p);
+        if (m) return m[1];
+      }
+      // Bukan link, kemungkinan sudah berupa ID mentah -- pakai apa adanya.
+      return s;
+    }
+
+    // Putar materi video LANGSUNG di halaman ini (iframe embed) -- tidak membuka tab/aplikasi
+    // YouTube terpisah.
+    function playYoutubeInline() {
+      const id = extractYoutubeId_(currentMeetingYoutube);
+      if (!id) {
+        showToast('Belum Ada Materi Video', 'Dosen belum mengisi ID/link YouTube untuk pertemuan ini.', 'error');
+        return;
+      }
+      const box = document.getElementById('ytPlayerBox');
+      document.getElementById('ytPlayerFrame').src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      box.classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Tampilkan tombol Absen GPS sesuai status: sudah absen di pertemuan ini -> dikunci +
+    // tanda centang, supaya tidak bisa dobel (dan tidak menimbulkan data ganda di Sheet).
+    function setAbsenButtonState_(sudahAbsen) {
+      const btn = document.getElementById('btnAbsen');
+      if (!btn) return;
+      btn.disabled = !!sudahAbsen;
+      btn.classList.toggle('opacity-60', !!sudahAbsen);
+      btn.classList.toggle('cursor-not-allowed', !!sudahAbsen);
+      btn.innerHTML = sudahAbsen
+        ? '<i class="fa-solid fa-circle-check"></i> <span>Sudah Absen</span>'
+        : '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
+    }
+
     // ===== SISI MAHASISWA: materi + forum per pertemuan =====
     function loadStudentMeetingContent(courseId, meeting) {
-      document.getElementById('btnYT').href = '#';
       document.getElementById('btnPPT').href = '#';
       document.getElementById('btnPDF').href = '#';
       document.getElementById('btnPDFSub').innerText = 'Memuat...';
+      setAbsenButtonState_(false);
+      currentMeetingYoutube = '';
+      document.getElementById('ytPlayerBox').classList.add('hidden');
+      document.getElementById('ytPlayerFrame').src = ''; // stop video lama biar tidak lanjut main di background
 
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'getCourseContent', courseId, meeting })
+        body: JSON.stringify({ action: 'getCourseContent', courseId, meeting, npm: currentUser.npm })
       })
       .then(res => res.json())
       .then(result => {
         if (result.status !== 'success') return;
         const c = result.content;
-        document.getElementById('btnYT').href = c.youtube || '#';
+        currentMeetingYoutube = c.youtube || '';
         document.getElementById('btnPPT').href = c.ppt || '#';
         document.getElementById('btnPDF').href = c.pdf || '#';
         document.getElementById('btnPDFSub').innerText = c.pdf ? 'Buka dokumen PDF' : 'Belum diatur dosen';
+        setAbsenButtonState_(!!result.sudahAbsen);
       })
       .catch(() => {});
 
@@ -989,10 +1045,20 @@
       AD: 'UMB Gedung AD', HD: 'UMB Gedung HD', SMK: 'UMB Gedung SMK', POLTEKKES: 'Poltekkes Kemenkes Bengkulu', DARING: 'Daring (bebas lokasi)'
     };
 
+    // Cocokkan kelas user (dosen/mahasiswa) ke tiap MK secara PERSIS -- BUKAN substring.
+    // Bug lama: `currentUser.kelas.includes(c.kelas)` salah karena "3C".includes("3") == true,
+    // jadi mahasiswa kelas 3C ikut ketarik ke MK "Kewirausahaan" kelas '3' juga (padahal itu
+    // kelas lain, meski nama MK sama). Kelas boleh ditulis lebih dari satu, dipisah koma/titik-koma.
+    function getUserCourses_() {
+      if (currentUser.kelas === 'ALL') return ALL_COURSES;
+      const myClasses = String(currentUser.kelas).split(/[,;]/).map(s => s.trim()).filter(Boolean);
+      return ALL_COURSES.filter(c => myClasses.includes(c.kelas));
+    }
+
     // Dosen dengan kelas 'ALL' mengelola semua MK; kalau tidak, hanya MK di kelasnya sendiri.
     // (Dipakai loadDashboard() utk grid kartu MK yg diampu dosen.)
     function dosenCourses() {
-      return currentUser.kelas === 'ALL' ? ALL_COURSES : ALL_COURSES.filter(c => currentUser.kelas.includes(c.kelas));
+      return getUserCourses_();
     }
 
     function loadRekapKelas() {
@@ -1309,22 +1375,20 @@
         .then(result => {
           if (result.status === 'success') {
             showToast('Presensi Berhasil', result.message || `Absen Pertemuan ${meeting} berhasil dikirim ke Google Sheets!`, 'success');
+            setAbsenButtonState_(true);
           } else {
             showToast('Gagal Tersimpan', result.message || 'Server menolak data presensi. Cek Apps Script Executions.', 'error');
+            setAbsenButtonState_(!!result.sudahAbsen);
           }
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
         })
         .catch(err => {
           showToast('Gagal', 'Kesalahan koneksi/deployment GAS: ' + err.message, 'error');
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
+          setAbsenButtonState_(false);
         });
 
       }, err => {
         showToast('Izin GPS Ditolak', 'Aktifkan/Izinkan akses lokasi GPS pada browser Anda.', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> <span>Absen GPS</span>';
+        setAbsenButtonState_(false);
       });
     }
 
