@@ -344,8 +344,9 @@
           <p class="text-[11px] text-slate-400 mt-3">Nilai berjalan dihitung dari komponen yang sudah ada nilainya saja (di-prorata) -- akan makin akurat seiring komponen lain terisi.</p>
         </div>
 
-        <!-- Grid Fitur Pembelajaran -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Grid Fitur Pembelajaran (khusus tampilan mahasiswa -- dosen mengatur link yang sama
+             lewat form "Materi & Lokasi Presensi" di atas, tidak perlu lihat preview kartu ini) -->
+        <div id="fiturPembelajaranGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <a id="btnYT" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-red-400 hover:shadow-md transition group flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl group-hover:bg-red-600 group-hover:text-white transition">
               <i class="fa-brands fa-youtube"></i>
@@ -397,15 +398,27 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Tipe Tugas</label>
-              <select id="taskTypeSelect" class="w-full bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none">
+              <select id="taskTypeSelect" onchange="onTaskTypeChange()" class="w-full bg-slate-50 border border-slate-200 text-sm font-semibold rounded-xl px-4 py-2.5 outline-none">
                 <option value="individu">Tugas Mandiri (Individu)</option>
                 <option value="kelompok">Tugas Kelompok (PBL)</option>
               </select>
             </div>
 
+            <div id="groupMembersBox" class="hidden">
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Anggota Kelompok (dari kelas Anda)</label>
+              <div id="groupMembersList" class="max-h-32 overflow-y-auto space-y-1 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">Memuat daftar teman sekelas...</div>
+              <p class="text-[10px] text-slate-400 mt-1">Anggota yang dicentang otomatis dapat nilai yang sama dengan Anda utk tugas ini.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Perintah / Topik Tugas Pertemuan Ini</label>
+              <textarea id="taskPerintahText" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Tuliskan soal/perintah tugas dari dosen utk pertemuan ini -- dipakai AI sebagai acuan menilai jawaban Anda, bukan asal menilai."></textarea>
+            </div>
+
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Isi Jawaban / Link Laporan</label>
-              <textarea id="taskAnswerText" rows="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Tuliskan teks rangkuman atau tempelkan link Google Drive di sini..."></textarea>
+              <textarea id="taskAnswerText" rows="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-sm outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Tuliskan teks rangkuman langsung, ATAU tempelkan link Google Drive/Docs laporan Anda..."></textarea>
+              <p class="text-[10px] text-slate-400 mt-1">Kalau pakai link Google Drive/Docs: ubah sharing filenya ke "Anyone with the link" (minimal Viewer) supaya AI bisa membaca isinya -- kalau tidak, tugas otomatis ditandai "Perlu Review Manual" dosen.</p>
             </div>
 
             <button onclick="submitAssignmentToQueue()" id="btnSubmitTask" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2">
@@ -587,7 +600,7 @@
       document.getElementById('lecturerMeetingPanel').classList.toggle('hidden', !isLecturer);
       document.getElementById('btnAbsen').classList.toggle('hidden', isLecturer);
       document.getElementById('kotakNilai').classList.toggle('hidden', isLecturer);
-      document.getElementById('btnKuisOnlineCard').classList.toggle('hidden', isLecturer);
+      document.getElementById('fiturPembelajaranGrid').classList.toggle('hidden', isLecturer);
       document.getElementById('studentSubmissionGrid').classList.toggle('hidden', isLecturer);
 
       if (!isLecturer) {
@@ -605,6 +618,17 @@
       replyToCommentId = '';
       const replyBox = document.getElementById('forumReplyingTo');
       if (replyBox) replyBox.classList.add('hidden');
+
+      // Reset draft form Tugas -- perintah/jawaban/anggota kelompok itu spesifik per
+      // pertemuan, jangan kebawa saat pindah pertemuan lain.
+      const taskAnswerEl = document.getElementById('taskAnswerText');
+      const taskPerintahEl = document.getElementById('taskPerintahText');
+      if (taskAnswerEl) taskAnswerEl.value = '';
+      if (taskPerintahEl) taskPerintahEl.value = '';
+      const taskTypeEl = document.getElementById('taskTypeSelect');
+      if (taskTypeEl) taskTypeEl.value = 'individu';
+      const groupBox = document.getElementById('groupMembersBox');
+      if (groupBox) groupBox.classList.add('hidden');
 
       if (currentUser.role === 'lecturer') {
         loadLecturerMeetingContent(activeMK.id, meeting);
@@ -1340,16 +1364,57 @@
       });
     }
 
+    // Tampil/sembunyi picker anggota kelompok saat Tipe Tugas diganti, dan muat roster
+    // teman sekelas (HANYA kelas yang sama dgn activeMK -- tidak ada lintas kelas).
+    function onTaskTypeChange() {
+      const isGroup = document.getElementById('taskTypeSelect').value === 'kelompok';
+      document.getElementById('groupMembersBox').classList.toggle('hidden', !isGroup);
+      if (isGroup) loadGroupMembersRoster();
+    }
+
+    function loadGroupMembersRoster() {
+      const box = document.getElementById('groupMembersList');
+      box.innerHTML = 'Memuat daftar teman sekelas...';
+
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'getClassRoster', kelas: activeMK.kelas })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status !== 'success') { box.innerHTML = result.message || 'Gagal memuat.'; return; }
+        const teman = result.roster.filter(r => String(r.npm).trim() !== String(currentUser.npm).trim());
+        if (!teman.length) { box.innerHTML = '<p class="text-slate-400">Tidak ada mahasiswa lain terdaftar di kelas ini.</p>'; return; }
+        box.innerHTML = teman.map(r => `
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" class="group-member-cb" value="${r.npm}">
+            <span>${r.nama} <span class="text-slate-400">(${r.npm})</span></span>
+          </label>`).join('');
+      })
+      .catch(err => { box.innerHTML = 'Gagal memuat: ' + err.message; });
+    }
+
     function submitAssignmentToQueue() {
       const ans = document.getElementById('taskAnswerText').value.trim();
+      const perintah = document.getElementById('taskPerintahText').value.trim();
       const taskType = document.getElementById('taskTypeSelect').value;
+      const isGroup = taskType === 'kelompok';
       const meeting = document.getElementById('meetingSelect').value;
       const btn = document.getElementById('btnSubmitTask');
 
+      if (!perintah) {
+        showToast('Peringatan', 'Tuliskan dulu perintah/topik tugas pertemuan ini (dipakai AI sbg acuan menilai).', 'error');
+        return;
+      }
       if (!ans) {
         showToast('Peringatan', 'Tuliskan jawaban atau masukkan link tugas!', 'error');
         return;
       }
+
+      const groupMembers = isGroup
+        ? Array.from(document.querySelectorAll('.group-member-cb:checked')).map(cb => cb.value)
+        : [];
 
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Mengirim Tugas...</span>';
@@ -1361,7 +1426,9 @@
         courseId: activeMK.id,
         meeting: meeting,
         answer: ans,
-        isGroup: taskType === 'kelompok'
+        perintah: perintah,
+        isGroup: isGroup,
+        groupMembers: groupMembers
       };
 
       fetch(GAS_WEB_APP_URL, {
