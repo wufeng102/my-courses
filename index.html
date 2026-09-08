@@ -2,6 +2,11 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <!-- Cegah browser/CDN menyimpan cache halaman ini terlalu lama -- dikombinasikan dgn
+       skrip cek-versi otomatis di bawah (lihat komentar BUILD_VERSION). -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>My-Courses - Portal Pembelajaran Daring</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,6 +16,39 @@
   </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <script>
+    // ===== CEK VERSI OTOMATIS -- supaya browser TIDAK perlu di-clear cache / ganti browser
+    // manual tiap kali file ini di-update di GitHub/Apps Script =====
+    // window.BUILD_VERSION = tanggal terakhir file ini diedit. NAIKKAN nilainya setiap kali
+    // index.html diganti dgn versi baru (Claude akan selalu menaikkan ini saat mengirim file
+    // baru). Begitu halaman dimuat, skrip ini diam-diam mengambil ULANG file HTML ini sendiri
+    // langsung dari server (dgn parameter unik supaya TIDAK kena cache browser/CDN GitHub
+    // Pages), lalu membandingkan versi di dalamnya dgn versi yang sedang berjalan di browser
+    // Anda. Kalau beda (artinya server sudah punya versi lebih baru drpd yg di-cache browser),
+    // halaman otomatis reload SEKALI ke URL ber-cache-bust supaya langsung dapat versi
+    // terbaru -- tanpa perlu Ctrl+Shift+R, clear cache, atau pindah browser.
+    // BATASAN JUJUR: ini cuma menolong mulai dari kunjungan BERIKUTNYA setelah skrip ini ada
+    // di file yg ter-cache. Kalau browser seseorang masih memegang versi index.html yang
+    // BELUM punya skrip ini sama sekali, kunjungan itu tetap perlu 1x hard refresh manual --
+    // setelah itu, semua update berikutnya akan otomatis.
+    window.BUILD_VERSION = '2026-09-08-01';
+    (function () {
+      try {
+        fetch(location.pathname + '?_cachebust=' + Date.now(), { cache: 'no-store' })
+          .then(function (res) { return res.text(); })
+          .then(function (html) {
+            const m = html.match(/BUILD_VERSION\s*=\s*'([^']+)'/);
+            if (!m || m[1] === window.BUILD_VERSION) return;
+            const alreadyReloadingFor = sessionStorage.getItem('mycourses_reloading_for_version');
+            if (alreadyReloadingFor === m[1]) return; // sudah pernah dicoba reload utk versi ini, jangan looping
+            sessionStorage.setItem('mycourses_reloading_for_version', m[1]);
+            location.href = location.pathname + '?_v=' + encodeURIComponent(m[1]);
+          })
+          .catch(function () { /* gagal cek versi -> diamkan saja, jangan ganggu pengguna */ });
+      } catch (e) { /* browser lama tanpa fetch/sessionStorage -> abaikan, tidak fatal */ }
+    })();
+  </script>
 
   <!-- Toast Notification Custom -->
   <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
