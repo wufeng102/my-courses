@@ -32,7 +32,7 @@
     // di file yg ter-cache. Kalau browser seseorang masih memegang versi index.html yang
     // BELUM punya skrip ini sama sekali, kunjungan itu tetap perlu 1x hard refresh manual --
     // setelah itu, semua update berikutnya akan otomatis.
-    window.BUILD_VERSION = '2026-09-08-05';
+    window.BUILD_VERSION = '2026-09-24-01';
     (function () {
       try {
         fetch(location.pathname + '?_cachebust=' + Date.now(), { cache: 'no-store' })
@@ -266,6 +266,17 @@
                 </select>
               </div>
             </div>
+
+            <!-- Buka/tutup absen pertemuan ini -- dipakai utk mengunci absen pertemuan yang
+                 sudah lewat, TANPA mematikan materi/forum/kuis-nya. -->
+            <div class="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3">
+              <label for="lecAbsenEnabled" class="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer">
+                <input type="checkbox" id="lecAbsenEnabled" checked class="w-4 h-4 accent-emerald-600">
+                <span>Absensi Dibuka utk Pertemuan Ini</span>
+              </label>
+              <p id="lecAttendanceOverviewText" class="text-xs text-slate-400">Memuat ringkasan absen...</p>
+            </div>
+
             <button onclick="saveLecturerMeetingContent()" id="btnSaveLecMeeting" class="w-full md:w-auto bg-slate-900 hover:bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl transition text-sm">Simpan Pengaturan Pertemuan Ini</button>
           </div>
 
@@ -312,6 +323,33 @@
             <p id="quizStatusText" class="text-xs font-semibold text-slate-500">Memuat status kuis...</p>
           </div>
 
+          <!-- Daftar mahasiswa per pertemuan: status absen (+ tandai Izin/Alpha manual) dan
+               tugas yang dikumpulkan (tautan, nilai AI, feedback AI) -- supaya dosen bisa cek
+               ulang isi tugas tiap orang tanpa buka Google Sheet. -->
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
+              <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
+                <i class="fa-solid fa-users text-indigo-600"></i><span>Daftar Mahasiswa -- Pertemuan Ini</span>
+              </h3>
+              <button onclick="loadMeetingRoster()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Refresh</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-left text-slate-500 uppercase border-b">
+                    <th class="py-2 pr-3">NPM</th>
+                    <th class="py-2 pr-3">Nama</th>
+                    <th class="py-2 pr-3">Absen</th>
+                    <th class="py-2 pr-3">Tugas</th>
+                    <th class="py-2 pr-3">Nilai AI</th>
+                    <th class="py-2 pr-3">Feedback AI</th>
+                  </tr>
+                </thead>
+                <tbody id="meetingRosterBody"><tr><td colspan="6" class="py-3 text-slate-400">Memuat daftar mahasiswa...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
           <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
               <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
@@ -349,6 +387,7 @@
           </div>
           <div id="komponenNilaiGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-center"></div>
           <p class="text-[11px] text-slate-400 mt-3">Nilai berjalan dihitung dari komponen yang sudah ada nilainya saja (di-prorata) -- akan makin akurat seiring komponen lain terisi.</p>
+          <div id="absensiRekapBox" class="mt-3 pt-3 border-t flex flex-wrap gap-4 text-xs text-slate-500">Memuat rekap absensi...</div>
         </div>
 
         <!-- Grid Fitur Pembelajaran (khusus tampilan mahasiswa -- dosen mengatur link yang sama
@@ -691,6 +730,31 @@
     // Dosen biasanya cuma salin ID video (bukan link lengkap) -- fungsi ini menerima ID mentah
     // ATAU berbagai format link YouTube (watch?v=, youtu.be/, embed/, shorts/) dan mengembalikan
     // ID 11-karakternya saja, supaya bisa dipakai sebagai src iframe pemutar inline.
+    // Dosen tempel link "share" biasa (Dropbox: ...?dl=0, Google Drive: /file/d/ID/view) --
+    // link itu membuka halaman PREVIEW yang kadang minta login/tidak langsung mengunduh.
+    // Fungsi ini mengubahnya jadi link FORCE-DOWNLOAD supaya begitu diklik langsung terunduh,
+    // tanpa dosen perlu tahu format link yang benar.
+    function toDirectDownloadLink_(url) {
+      if (!url) return '';
+      let u = String(url).trim();
+
+      // Dropbox: dl=0 (preview, kadang minta login) -> dl=1 (force download).
+      if (/dropbox\.com/i.test(u)) {
+        if (/[?&]dl=0\b/.test(u)) return u.replace(/([?&])dl=0\b/, '$1dl=1');
+        if (/[?&]dl=1\b/.test(u)) return u;
+        return u + (u.includes('?') ? '&dl=1' : '?dl=1');
+      }
+
+      // Google Drive "view" link -> endpoint download langsung.
+      const driveMatch = u.match(/drive\.google\.com\/(?:file\/d\/([a-zA-Z0-9_-]{15,})|open\?id=([a-zA-Z0-9_-]{15,}))/);
+      if (driveMatch) {
+        const id = driveMatch[1] || driveMatch[2];
+        return `https://drive.google.com/uc?export=download&id=${id}`;
+      }
+
+      return u;
+    }
+
     function extractYoutubeId_(raw) {
       if (!raw) return '';
       const s = String(raw).trim();
@@ -753,8 +817,8 @@
         if (result.status !== 'success') return;
         const c = result.content;
         currentMeetingYoutube = c.youtube || '';
-        document.getElementById('btnPPT').href = c.ppt || '#';
-        document.getElementById('btnPDF').href = c.pdf || '#';
+        document.getElementById('btnPPT').href = c.ppt ? toDirectDownloadLink_(c.ppt) : '#';
+        document.getElementById('btnPDF').href = c.pdf ? toDirectDownloadLink_(c.pdf) : '#';
         document.getElementById('btnPDFSub').innerText = c.pdf ? 'Buka dokumen PDF' : 'Belum diatur dosen';
         setAbsenButtonState_(!!result.sudahAbsen);
       })
@@ -819,6 +883,7 @@
       document.getElementById('lecPpt').value = '';
       document.getElementById('lecPdf').value = '';
       document.getElementById('lecLokasi').value = '';
+      document.getElementById('lecAbsenEnabled').checked = true;
 
       // Mode UTS/UAS cuma relevan & ditampilkan persis di pertemuan 8/16.
       const isUts = String(meeting) === '8';
@@ -841,6 +906,7 @@
         // Kalau pertemuan ini belum punya lokasi sendiri, pra-isi dgn lokasi terakhir yg
         // disimpan dosen di kelas ini (bukan wajib pilih ulang tiap pertemuan).
         document.getElementById('lecLokasi').value = c.lokasi || lastUsedLokasi || '';
+        document.getElementById('lecAbsenEnabled').checked = c.absenEnabled !== false;
       })
       .catch(() => {});
 
@@ -862,6 +928,8 @@
 
       loadLecturerForumPanel(courseId, meeting);
       loadQuizSettingForm();
+      loadMeetingRoster();
+      loadAttendanceOverview();
     }
 
     function saveLecturerMeetingContent() {
@@ -885,7 +953,8 @@
             youtube: document.getElementById('lecYoutube').value.trim(),
             ppt: document.getElementById('lecPpt').value.trim(),
             pdf: document.getElementById('lecPdf').value.trim(),
-            lokasi: lokasi
+            lokasi: lokasi,
+            absenEnabled: document.getElementById('lecAbsenEnabled').checked
           })
         }).then(res => res.json())
       ];
@@ -910,6 +979,7 @@
         const allOk = results.every(r => r.status === 'success');
         showToast(allOk ? 'Tersimpan' : 'Gagal', results.map(r => r.message).filter(Boolean).join(' ') || (allOk ? 'Pengaturan pertemuan ini disimpan.' : 'Ada bagian yang gagal disimpan.'), allOk ? 'success' : 'error');
         if (allOk && lokasi) lastUsedLokasi = lokasi;
+        if (allOk) loadAttendanceOverview();
         btn.disabled = false;
         btn.innerText = 'Simpan Pengaturan Pertemuan Ini';
       })
@@ -918,6 +988,116 @@
         btn.disabled = false;
         btn.innerText = 'Simpan Pengaturan Pertemuan Ini';
       });
+    }
+
+    // Ringkasan "X pertemuan absen ditutup (sudah dilalui) / Y masih terbuka" utk kelas yg
+    // sedang dibuka dosen -- dihitung dari 16 pertemuan sekaligus lewat getAttendanceOverview.
+    function loadAttendanceOverview() {
+      const el = document.getElementById('lecAttendanceOverviewText');
+      if (!el || !activeMK) return;
+      el.innerText = 'Memuat ringkasan absen...';
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'getAttendanceOverview', courseId: activeMK.id })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status !== 'success') { el.innerText = ''; return; }
+        const closed = result.meetings.filter(m => !m.absenEnabled).length;
+        const open = result.meetings.length - closed;
+        el.innerText = `${closed} pertemuan ditutup (sudah dilalui) • ${open} masih terbuka`;
+      })
+      .catch(() => { el.innerText = ''; });
+    }
+
+    // Daftar mahasiswa 1 kelas utk pertemuan yg sedang dipilih dosen: status absen (+ tombol
+    // tandai manual Hadir/Izin/Alpha) dan ringkasan tugas yang mereka kumpulkan (tautan, nilai
+    // AI, feedback AI) -- supaya dosen bisa cek ulang isi tugas tanpa buka Google Sheet.
+    function loadMeetingRoster() {
+      const tbody = document.getElementById('meetingRosterBody');
+      if (!tbody || !activeMK) return;
+      const meeting = document.getElementById('meetingSelect').value;
+      tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-slate-400">Memuat daftar mahasiswa...</td></tr>`;
+
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'getMeetingRoster', courseId: activeMK.id, meeting, kelas: activeMK.kelas })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status !== 'success') {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-red-500">${result.message || 'Gagal memuat daftar mahasiswa.'}</td></tr>`;
+          return;
+        }
+        const roster = result.roster || [];
+        if (!roster.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-slate-400">Belum ada mahasiswa terdaftar di kelas ini.</td></tr>`;
+          return;
+        }
+        const absenBadge = (status) => {
+          const map = {
+            'Hadir': 'bg-emerald-100 text-emerald-700',
+            'Izin': 'bg-amber-100 text-amber-700',
+            'Alpha': 'bg-red-100 text-red-700',
+            'Ditolak (Di Luar Radius)': 'bg-red-100 text-red-700',
+            'Belum Absen': 'bg-slate-100 text-slate-500'
+          };
+          const cls = map[status] || 'bg-slate-100 text-slate-500';
+          return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${cls}">${status}</span>`;
+        };
+        tbody.innerHTML = roster.map(s => {
+          const sub = s.submission;
+          let tugasCell = '<span class="text-slate-300">Belum mengumpulkan</span>';
+          let skorCell = '-';
+          let feedbackCell = '-';
+          if (sub) {
+            const jawaban = String(sub.jawaban || '');
+            tugasCell = /^https?:\/\//i.test(jawaban.trim())
+              ? `<a href="${jawaban.trim()}" target="_blank" class="text-indigo-600 underline font-semibold">Buka Tugas</a>`
+              : `<span title="${jawaban.replace(/"/g, '&quot;')}" class="line-clamp-2 max-w-[220px] inline-block align-top">${jawaban || '-'}</span>`;
+            tugasCell += `<div class="text-[10px] text-slate-400 mt-0.5">${sub.tipe || ''}${sub.anggota ? ' • ' + sub.anggota : ''}</div>`;
+            skorCell = `<span class="font-bold ${sub.status === 'Perlu Review Manual' ? 'text-amber-600' : 'text-slate-800'}">${sub.skor}</span> <span class="text-[10px] text-slate-400">(${sub.status})</span>`;
+            feedbackCell = `<span title="${String(sub.feedback || '').replace(/"/g, '&quot;')}" class="line-clamp-2 max-w-[220px] inline-block align-top">${sub.feedback || '-'}</span>`;
+          }
+          return `
+            <tr class="border-b border-slate-50 align-top">
+              <td class="py-2 pr-3 whitespace-nowrap">${s.npm}</td>
+              <td class="py-2 pr-3 whitespace-nowrap font-semibold text-slate-700">${s.nama}</td>
+              <td class="py-2 pr-3">
+                ${absenBadge(s.absenStatus)}
+                <div class="flex gap-1 mt-1">
+                  <button onclick="markAttendanceManual('${s.npm}','Hadir')" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 hover:bg-emerald-100 text-slate-500">Hadir</button>
+                  <button onclick="markAttendanceManual('${s.npm}','Izin')" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 hover:bg-amber-100 text-slate-500">Izin</button>
+                  <button onclick="markAttendanceManual('${s.npm}','Alpha')" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 hover:bg-red-100 text-slate-500">Alpha</button>
+                </div>
+              </td>
+              <td class="py-2 pr-3">${tugasCell}</td>
+              <td class="py-2 pr-3 whitespace-nowrap">${skorCell}</td>
+              <td class="py-2 pr-3">${feedbackCell}</td>
+            </tr>`;
+        }).join('');
+      })
+      .catch(err => {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-3 text-red-500">Gagal memuat: ${err.message}</td></tr>`;
+      });
+    }
+
+    // Dosen menandai status absen manual (mis. mahasiswa izin sakit/dinas) dari daftar mahasiswa.
+    function markAttendanceManual(npm, status) {
+      const meeting = document.getElementById('meetingSelect').value;
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'setAttendanceStatus', npm, courseId: activeMK.id, meeting, status })
+      })
+      .then(res => res.json())
+      .then(result => {
+        showToast(result.status === 'success' ? 'Tersimpan' : 'Gagal', result.message || '', result.status === 'success' ? 'success' : 'error');
+        if (result.status === 'success') loadMeetingRoster();
+      })
+      .catch(err => showToast('Gagal', 'Kesalahan koneksi: ' + err.message, 'error'));
     }
 
     function loadLecturerForumPanel(courseId, meeting) {
@@ -1032,6 +1212,33 @@
       .catch(err => {
         grid.innerHTML = `<p class="col-span-full text-xs text-red-500">Gagal memuat: ${err.message}</p>`;
       });
+
+      loadAbsensiRekap();
+    }
+
+    // Info akumulasi absensi (Hadir/Izin) mahasiswa utk MK ini -- ditampilkan di Kotak Nilai
+    // sbg INFORMASI SAJA, bukan komponen nilai berbobot (komponen "Kehadiran" yg berbobot
+    // sudah dihitung terpisah di getStudentGrades_).
+    function loadAbsensiRekap() {
+      const box = document.getElementById('absensiRekapBox');
+      if (!box) return;
+      box.innerText = 'Memuat rekap absensi...';
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'getAttendanceRekap', npm: currentUser.npm, courseId: activeMK.id })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status !== 'success') { box.innerText = ''; return; }
+        const r = result.rekap;
+        box.innerHTML = `
+          <span><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>Hadir <b class="text-slate-700">${r.hadir}x</b></span>
+          <span><i class="fa-solid fa-note-sticky text-amber-500 mr-1"></i>Izin <b class="text-slate-700">${r.izin}x</b></span>
+          <span><i class="fa-solid fa-circle-xmark text-red-400 mr-1"></i>Alpha <b class="text-slate-700">${r.alpha}x</b></span>
+          <span class="text-slate-400">dari ${r.totalPertemuan} pertemuan</span>`;
+      })
+      .catch(() => { box.innerText = ''; });
     }
 
     function showCourseList() {
