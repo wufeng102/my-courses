@@ -8,6 +8,18 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>My-Courses - Portal Pembelajaran Daring</title>
+
+  <!-- PWA: supaya bisa "Diinstal" jadi aplikasi dari browser (Chrome/Edge/Android: tombol
+       Install; iOS Safari: Share > Add to Home Screen). -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#312e81">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="My-Courses">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -32,7 +44,7 @@
     // di file yg ter-cache. Kalau browser seseorang masih memegang versi index.html yang
     // BELUM punya skrip ini sama sekali, kunjungan itu tetap perlu 1x hard refresh manual --
     // setelah itu, semua update berikutnya akan otomatis.
-    window.BUILD_VERSION = '2026-09-24-01';
+    window.BUILD_VERSION = '2026-11-04-01';
     (function () {
       try {
         fetch(location.pathname + '?_cachebust=' + Date.now(), { cache: 'no-store' })
@@ -47,6 +59,54 @@
           })
           .catch(function () { /* gagal cek versi -> diamkan saja, jangan ganggu pengguna */ });
       } catch (e) { /* browser lama tanpa fetch/sessionStorage -> abaikan, tidak fatal */ }
+    })();
+  </script>
+
+  <script>
+    // ===== PWA: daftarkan service worker + tombol "Instal Aplikasi" =====
+    // Service worker HANYA untuk syarat installability + fallback offline ringan -- strateginya
+    // network-first (lihat komentar di sw.js), jadi TIDAK mengganggu mekanisme cek-versi
+    // otomatis di atas.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const btn = document.getElementById('btnInstallApp');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      const btn = document.getElementById('btnInstallApp');
+      if (btn) btn.style.display = 'none';
+    });
+
+    function installApp() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.finally(() => {
+        deferredInstallPrompt = null;
+        const btn = document.getElementById('btnInstallApp');
+        if (btn) btn.style.display = 'none';
+      });
+    }
+
+    // iOS Safari tidak mendukung beforeinstallprompt sama sekali -- kalau terdeteksi dan
+    // belum terinstal (standalone), tampilkan petunjuk manual sebagai gantinya.
+    (function () {
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+      if (isIOS && !isStandalone) {
+        document.addEventListener('DOMContentLoaded', () => {
+          const hint = document.getElementById('iosInstallHint');
+          if (hint) hint.style.display = 'block';
+        });
+      }
     })();
   </script>
 
@@ -115,11 +175,19 @@
           <p id="userName" class="text-xs font-extrabold text-slate-800 leading-none"></p>
           <p id="userSub" class="text-[11px] text-slate-400 mt-0.5"></p>
         </div>
+        <button onclick="installApp()" id="btnInstallApp" class="items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition" style="display:none">
+          <i class="fa-solid fa-download"></i><span class="hidden sm:inline">Instal Aplikasi</span>
+        </button>
         <button onclick="location.reload()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 flex items-center justify-center transition">
           <i class="fa-solid fa-power-off"></i>
         </button>
       </div>
     </nav>
+
+    <!-- Petunjuk manual utk iOS Safari (beforeinstallprompt tidak didukung di iOS). -->
+    <div id="iosInstallHint" class="bg-indigo-50 text-indigo-800 text-xs font-semibold px-6 py-2.5 text-center" style="display:none">
+      <i class="fa-solid fa-circle-info mr-1"></i>Di iPhone/iPad: ketuk tombol <i class="fa-solid fa-arrow-up-from-bracket"></i> Share, lalu pilih "Add to Home Screen" untuk menginstal My-Courses.
+    </div>
 
     <main class="max-w-7xl mx-auto p-6 space-y-6">
       
