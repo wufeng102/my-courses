@@ -12,7 +12,7 @@
   <!-- PWA: supaya bisa "Diinstal" jadi aplikasi dari browser (Chrome/Edge/Android: tombol
        Install; iOS Safari: Share > Add to Home Screen). -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#312e81">
+  <meta name="theme-color" content="#0b1b33">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="mobile-web-app-capable" content="yes">
@@ -23,11 +23,65 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+    :root{
+      --navy-900:#0b1b33; --navy-800:#11284a; --navy-700:#17335e;
+      --gold-600:#a9802f; --gold-500:#c9a24b; --gold-400:#d4af6a; --gold-300:#e6cd94;
+      --ivory-50:#fffdf8; --ivory-100:#fdf8ec; --stone-200:#e8dfc8; --stone-300:#ddd0ab;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f6f3ea; }
+    .font-display{ font-family:'Playfair Display', serif; }
+
+    /* Garis tipis emas-navy di puncak halaman -- aksen "kop surat" khas agency */
+    .letterhead-bar{ height:3px; background:linear-gradient(90deg, var(--navy-900) 0%, var(--gold-400) 50%, var(--navy-900) 100%); }
+
+    /* Pola garis terinspirasi batik besurek (khas Bengkulu: bunga Rafflesia & relung paku)
+       -- dipakai sbg tekstur latar tipis di atas permukaan navy (panel login, banner). */
+    /* Catatan: pakai --pattern-grad (bukan "background:" inline) di elemen yg memakai class ini,
+       supaya gradasi navy per-elemen tidak menimpa/menghapus layer pola SVG di bawah ini
+       (inline style selalu menang atas class utk properti yg SAMA -- "background" shorthand akan
+       menghapus background-image dari class ini kalau dipakai bersamaan). */
+    .pattern-besurek{
+      background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22220%22%20height=%22220%22%20viewBox=%220%200%20220%20220%22%3E%20%3Cg%20fill=%22none%22%20stroke=%22%23d4af6a%22%20stroke-width=%221.4%22%20stroke-linecap=%22round%22%3E%20%3Cpath%20d=%22M14,206%20C14,160%2062,162%2062,118%20C62,78%2026,80%2026,42%20C26,18%2046,10%2046,10%22%20/%3E%20%3Cpath%20d=%22M30,206%20C30,172%2058,170%2058,140%22%20opacity=%220.6%22/%3E%20%3Cg%20transform=%22translate%28166,54%29%22%3E%20%3Ccircle%20r=%2210%22%20/%3E%20%3Ccircle%20cx=%220%22%20cy=%22-19%22%20r=%229%22/%3E%20%3Ccircle%20cx=%2218%22%20cy=%22-6%22%20r=%229%22/%3E%20%3Ccircle%20cx=%2211%22%20cy=%2216%22%20r=%229%22/%3E%20%3Ccircle%20cx=%22-11%22%20cy=%2216%22%20r=%229%22/%3E%20%3Ccircle%20cx=%22-18%22%20cy=%22-6%22%20r=%229%22/%3E%20%3Ccircle%20r=%223%22%20fill=%22%23d4af6a%22%20stroke=%22none%22/%3E%20%3C/g%3E%20%3Cpath%20d=%22M150,130%20C168,130%20168,150%20150,154%20C132,158%20132,178%20150,180%22%20opacity=%220.55%22/%3E%20%3Ccircle%20cx=%22190%22%20cy=%22190%22%20r=%222.4%22%20fill=%22%23d4af6a%22%20stroke=%22none%22/%3E%20%3Ccircle%20cx=%22108%22%20cy=%2230%22%20r=%222%22%20fill=%22%23d4af6a%22%20stroke=%22none%22/%3E%20%3Ccircle%20cx=%2296%22%20cy=%22196%22%20r=%222%22%20fill=%22%23d4af6a%22%20stroke=%22none%22/%3E%20%3C/g%3E%20%3C/svg%3E"), var(--pattern-grad, none);
+      background-repeat:repeat, no-repeat; background-size:220px 220px, auto; background-position:0 0, 0 0;
+    }
+    /* Watermark bunga sudut (nuansa Rafflesia) utk kartu ivory -- sangat samar, hanya tekstur */
+    .card-elegant{
+      background:linear-gradient(180deg, var(--ivory-50) 0%, var(--ivory-100) 100%);
+      border:1px solid var(--stone-200);
+      box-shadow:0 1px 2px rgba(17,40,74,0.04), 0 10px 28px -14px rgba(17,40,74,0.22);
+      position:relative; overflow:hidden;
+    }
+    .card-elegant::after{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22180%22%20height=%22180%22%20viewBox=%220%200%20180%20180%22%3E%20%3Cg%20fill=%22none%22%20stroke=%22%231a2b4a%22%20stroke-width=%221.6%22%20stroke-linecap=%22round%22%20opacity=%220.07%22%3E%20%3Cg%20transform=%22translate%28132,48%29%22%3E%20%3Ccircle%20r=%2213%22/%3E%20%3Ccircle%20cx=%220%22%20cy=%22-24%22%20r=%2212%22/%3E%20%3Ccircle%20cx=%2223%22%20cy=%22-7%22%20r=%2212%22/%3E%20%3Ccircle%20cx=%2214%22%20cy=%2220%22%20r=%2212%22/%3E%20%3Ccircle%20cx=%22-14%22%20cy=%2220%22%20r=%2212%22/%3E%20%3Ccircle%20cx=%22-23%22%20cy=%22-7%22%20r=%2212%22/%3E%20%3C/g%3E%20%3Cpath%20d=%22M30,170%20C30,120%2084,124%2084,78%20C84,40%2046,42%2046,8%22/%3E%20%3Cpath%20d=%22M52,170%20C52,138%2078,136%2078,112%22%20opacity=%220.6%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+      background-repeat:no-repeat; background-position:bottom right; background-size:150px 150px;
+    }
+    /* Garis bawah emas tipis pengganti border-b polos pd judul kartu */
+    .heading-ornament{ position:relative; padding-bottom:0.75rem; border-bottom:none !important; }
+    .heading-ornament::after{
+      content:""; position:absolute; left:0; bottom:0; height:2px; width:100%; border-radius:2px;
+      background:linear-gradient(90deg, var(--gold-500) 0%, rgba(201,162,75,0.18) 55%, transparent 100%);
+    }
+    /* Aksen batang emas di kiri judul seksi besar (gaya editorial) */
+    .section-title{ position:relative; padding-left:1rem; }
+    .section-title::before{
+      content:""; position:absolute; left:0; top:0.1em; bottom:0.1em; width:4px; border-radius:2px;
+      background:linear-gradient(180deg, var(--gold-400), var(--gold-600));
+    }
+    .input-elegant{ background:#faf8f2; border:1px solid var(--stone-200); transition:all .2s; }
+    .input-elegant:focus{ border-color:var(--gold-500); box-shadow:0 0 0 3px rgba(201,162,75,0.18); background:#fff; outline:none; }
+    .btn-navy-gold{
+      background:linear-gradient(135deg, var(--navy-800) 0%, var(--navy-900) 100%);
+      border:1px solid rgba(201,162,75,0.45);
+    }
+    .btn-navy-gold:hover{ background:linear-gradient(135deg, var(--navy-700) 0%, var(--navy-800) 100%); border-color:var(--gold-400); }
   </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <div class="letterhead-bar"></div>
 
   <script>
     // ===== CEK VERSI OTOMATIS -- supaya browser TIDAK perlu di-clear cache / ganti browser
@@ -44,7 +98,7 @@
     // di file yg ter-cache. Kalau browser seseorang masih memegang versi index.html yang
     // BELUM punya skrip ini sama sekali, kunjungan itu tetap perlu 1x hard refresh manual --
     // setelah itu, semua update berikutnya akan otomatis.
-    window.BUILD_VERSION = '2026-11-04-01';
+    window.BUILD_VERSION = '2026-11-16-01';
     (function () {
       try {
         fetch(location.pathname + '?_cachebust=' + Date.now(), { cache: 'no-store' })
@@ -125,49 +179,73 @@
   </div>
 
   <!-- 1. HALAMAN LOGIN -->
-  <div id="loginPage" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
-      <div class="bg-indigo-900 p-8 text-center text-white relative">
-        <div class="w-16 h-16 bg-white/10 rounded-2xl mx-auto flex items-center justify-center mb-4 backdrop-blur-md border border-white/20 shadow-inner">
-          <i class="fa-solid fa-graduation-cap text-3xl text-amber-400"></i>
+  <div id="loginPage" class="min-h-screen flex items-center justify-center p-4 sm:p-6" style="background:#f6f3ea">
+    <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-5 rounded-[28px] overflow-hidden shadow-2xl border border-[#e8dfc8]">
+
+      <!-- Panel Brand (kiri) -->
+      <div class="lg:col-span-2 pattern-besurek relative text-white p-8 sm:p-10 flex flex-col justify-between" style="--pattern-grad:linear-gradient(165deg, var(--navy-900) 0%, var(--navy-800) 55%, var(--navy-700) 100%); min-height:220px;">
+        <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 85% 100%, rgba(201,162,75,0.18), transparent 60%);"></div>
+        <div class="relative z-10">
+          <img src="logo.png" alt="My-Courses" class="w-16 h-16 rounded-2xl shadow-lg border border-white/20 bg-white/5 backdrop-blur-sm">
+          <h1 class="font-display text-3xl font-bold tracking-tight mt-6 leading-tight">My-Courses</h1>
+          <p class="text-[13px] mt-2" style="color:var(--gold-300)">Portal Pembelajaran Daring</p>
         </div>
-        <h1 class="text-2xl font-extrabold tracking-tight">My-Courses</h1>
-        <p class="text-xs text-indigo-200 mt-1">Portal Pembelajaran Daring milik Andi Azhar</p>
-      </div>
-      <div class="p-8 space-y-5">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Username (NPM / NIDN)</label>
-          <div class="relative">
-            <i class="fa-solid fa-id-card absolute left-4 top-3.5 text-slate-400"></i>
-            <input type="text" id="npm" placeholder="Masukkan NPM atau NIDN" class="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none text-sm font-semibold transition">
+        <div class="relative z-10 mt-10 space-y-3 hidden sm:block">
+          <div class="flex items-center gap-3 text-[13px] text-indigo-100/90">
+            <i class="fa-solid fa-location-dot" style="color:var(--gold-400)"></i><span>Presensi lokasi GPS</span>
+          </div>
+          <div class="flex items-center gap-3 text-[13px] text-indigo-100/90">
+            <i class="fa-solid fa-circle-play" style="color:var(--gold-400)"></i><span>Materi video & dokumen</span>
+          </div>
+          <div class="flex items-center gap-3 text-[13px] text-indigo-100/90">
+            <i class="fa-solid fa-square-poll-vertical" style="color:var(--gold-400)"></i><span>Kuis, tugas &amp; rekap nilai</span>
           </div>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Password</label>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
-            <input type="password" id="pass" placeholder="••••••••" class="w-full pl-11 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none text-sm font-semibold transition">
-          </div>
-          <p class="text-[11px] text-slate-400 mt-2">Password Baku: 4 digit NPM + UMB (Contoh: <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">1207UMB</code>)</p>
-        </div>
-        <button onclick="handleLogin()" id="btnLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition duration-200 flex items-center justify-center space-x-2">
-          <span>Masuk Portal My-Courses</span>
-          <i class="fa-solid fa-arrow-right text-xs"></i>
-        </button>
+        <p class="relative z-10 text-[11px] text-indigo-200/60 mt-10">&copy; <span id="loginYear"></span> Universitas Muhammadiyah Bengkulu &mdash; Andi Azhar</p>
+        <script>document.getElementById('loginYear').textContent = new Date().getFullYear();</script>
       </div>
+
+      <!-- Panel Form (kanan) -->
+      <div class="lg:col-span-3 bg-white p-8 sm:p-10 flex flex-col justify-center">
+        <div class="max-w-sm mx-auto w-full">
+          <h2 class="font-display text-2xl font-bold text-slate-900">Masuk ke Akun Anda</h2>
+          <p class="text-sm text-slate-400 mt-1.5 mb-7">Gunakan NPM/NIDN dan password Anda untuk melanjutkan.</p>
+
+          <div class="space-y-5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Username (NPM / NIDN)</label>
+              <div class="relative">
+                <i class="fa-solid fa-id-card absolute left-4 top-3.5 text-slate-400"></i>
+                <input type="text" id="npm" placeholder="Masukkan NPM atau NIDN" class="input-elegant w-full pl-11 pr-4 py-3 rounded-xl text-sm font-semibold">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Password</label>
+              <div class="relative">
+                <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
+                <input type="password" id="pass" placeholder="••••••••" class="input-elegant w-full pl-11 pr-4 py-3 rounded-xl text-sm font-semibold">
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2">Password Baku: 4 digit NPM + UMB (Contoh: <code class="bg-[#fdf8ec] px-1 py-0.5 rounded" style="color:var(--gold-600)">1207UMB</code>)</p>
+            </div>
+            <button onclick="handleLogin()" id="btnLogin" class="btn-navy-gold w-full active:scale-[0.98] text-white font-bold py-3.5 rounded-xl shadow-lg transition duration-200 flex items-center justify-center space-x-2">
+              <span>Masuk Portal My-Courses</span>
+              <i class="fa-solid fa-arrow-right text-xs" style="color:var(--gold-400)"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- 2. DASHBOARD UTAMA -->
   <div id="dashboardPage" class="hidden min-h-screen pb-12">
-    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+    <nav class="bg-white border-b border-[#e8dfc8] px-6 py-3.5 flex justify-between items-center sticky top-0 z-40 shadow-sm">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-indigo-200">
-          <i class="fa-solid fa-graduation-cap"></i>
-        </div>
+        <img src="logo.png" alt="My-Courses" class="w-10 h-10 rounded-xl shadow-md" style="box-shadow:0 2px 8px rgba(11,27,51,0.18)">
         <div>
-          <span class="font-extrabold text-lg text-slate-900 tracking-tight">My-Courses</span>
-          <span id="roleBadge" class="ml-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 uppercase">Mahasiswa</span>
+          <span class="font-display font-bold text-lg text-slate-900 tracking-tight">My-Courses</span>
+          <span id="roleBadge" class="ml-2 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" style="background:#fdf8ec;color:var(--gold-600)">Mahasiswa</span>
         </div>
       </div>
       <div class="flex items-center space-x-4">
@@ -175,7 +253,7 @@
           <p id="userName" class="text-xs font-extrabold text-slate-800 leading-none"></p>
           <p id="userSub" class="text-[11px] text-slate-400 mt-0.5"></p>
         </div>
-        <button onclick="installApp()" id="btnInstallApp" class="items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition" style="display:none">
+        <button onclick="installApp()" id="btnInstallApp" class="btn-navy-gold items-center space-x-2 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition" style="display:none">
           <i class="fa-solid fa-download"></i><span class="hidden sm:inline">Instal Aplikasi</span>
         </button>
         <button onclick="location.reload()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-600 flex items-center justify-center transition">
@@ -192,13 +270,15 @@
     <main class="max-w-7xl mx-auto p-6 space-y-6">
       
       <!-- Banner Selamat Datang -->
-      <div class="bg-gradient-to-r from-indigo-900 via-indigo-850 to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+      <div class="pattern-besurek rounded-3xl p-8 text-white shadow-xl relative overflow-hidden" style="--pattern-grad:linear-gradient(120deg, var(--navy-900) 0%, var(--navy-800) 60%, var(--navy-700) 100%);">
+        <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(90deg, var(--navy-900) 0%, rgba(11,27,51,0.92) 38%, rgba(11,27,51,0.35) 65%, transparent 85%);"></div>
+        <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 92% 8%, rgba(201,162,75,0.18), transparent 55%);"></div>
         <div class="relative z-10 space-y-4">
-          <span class="bg-white/10 text-indigo-200 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md">Semester Aktif</span>
-          <h2 class="text-3xl font-extrabold tracking-tight">Selamat Datang, <span id="bannerUser">Mahasiswa</span>!</h2>
+          <span class="text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md border" style="background:rgba(255,255,255,0.08);border-color:rgba(201,162,75,0.3);color:var(--gold-300)">Semester Aktif</span>
+          <h2 class="font-display text-3xl font-bold tracking-tight">Selamat Datang, <span id="bannerUser">Mahasiswa</span>!</h2>
           <p id="bannerDesc" class="text-indigo-200 text-sm max-w-2xl leading-relaxed">Pilih salah satu kelas di bawah ini untuk mulai mengisi presensi lokasi GPS, mengunduh PPT, menonton materi YouTube, pengerjaan kuis, dan pengumpulan tugas.</p>
-          <div class="inline-flex items-center space-x-3 bg-white/10 px-4 py-2 rounded-2xl backdrop-blur-md border border-white/10">
-            <i class="fa-solid fa-layer-group text-amber-400"></i>
+          <div class="inline-flex items-center space-x-3 px-4 py-2 rounded-2xl backdrop-blur-md border" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12)">
+            <i class="fa-solid fa-layer-group" style="color:var(--gold-400)"></i>
             <span class="text-xs font-bold" id="totalClassCountText">0 Kelas Aktif</span>
           </div>
         </div>
@@ -207,9 +287,9 @@
       <!-- TAMPILAN 1: DAFTAR KARTU MK MAHASISWA -->
       <div id="courseListSection" class="space-y-4">
         <div class="flex justify-between items-center flex-wrap gap-3">
-          <h3 class="text-xl font-bold text-slate-900">Daftar Kelas Perkuliahan Anda</h3>
+          <h3 class="section-title font-display text-xl font-bold text-slate-900">Daftar Kelas Perkuliahan Anda</h3>
           <div class="flex items-center gap-3">
-            <span id="classBadgeCount" class="text-xs font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-100">0 Kelas</span>
+            <span id="classBadgeCount" class="text-xs font-bold px-3 py-1 rounded-full border" style="background:#fdf8ec;color:var(--gold-600);border-color:var(--stone-200)">0 Kelas</span>
           </div>
         </div>
 
@@ -242,7 +322,7 @@
         </button>
 
         <!-- Header Kelas -->
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="card-elegant p-6 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <div class="flex items-center space-x-2 mb-1">
               <span id="activeKodeMK" class="text-xs font-bold bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-md"></span>
@@ -289,8 +369,8 @@
         <!-- DOSEN: SATU layar utk kelola pengaturan kelas, materi/lokasi/forum per pertemuan,
              kuis online, dan rekap nilai -- semua utk kelas (activeMK) yg sedang dibuka. -->
         <div id="lecturerMeetingPanel" class="hidden space-y-6">
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+          <div class="card-elegant p-6 rounded-3xl space-y-4">
+            <h3 class="font-bold text-lg text-slate-900 pb-3 flex items-center space-x-2 heading-ornament">
               <i class="fa-solid fa-sliders text-indigo-600"></i><span>Materi & Lokasi Presensi -- Pertemuan Ini</span>
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -348,8 +428,8 @@
             <button onclick="saveLecturerMeetingContent()" id="btnSaveLecMeeting" class="w-full md:w-auto bg-slate-900 hover:bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl transition text-sm">Simpan Pengaturan Pertemuan Ini</button>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+          <div class="card-elegant p-6 rounded-3xl space-y-4">
+            <h3 class="font-bold text-lg text-slate-900 pb-3 flex items-center space-x-2 heading-ornament">
               <i class="fa-solid fa-comments text-indigo-600"></i><span>Forum Diskusi Kasus -- Pertemuan Ini</span>
             </h3>
             <p id="lecForumStatus" class="text-xs font-semibold text-slate-500">Memuat status forum...</p>
@@ -365,8 +445,8 @@
             </div>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+          <div class="card-elegant p-6 rounded-3xl space-y-4">
+            <h3 class="font-bold text-lg text-slate-900 pb-3 flex items-center space-x-2 heading-ornament">
               <i class="fa-solid fa-robot text-indigo-600"></i><span>Kuis Online -- Pertemuan Ini (Soal Digenerate AI)</span>
             </h3>
             <p class="text-xs text-slate-500 -mt-2">
@@ -394,7 +474,7 @@
           <!-- Daftar mahasiswa per pertemuan: status absen (+ tandai Izin/Alpha manual) dan
                tugas yang dikumpulkan (tautan, nilai AI, feedback AI) -- supaya dosen bisa cek
                ulang isi tugas tiap orang tanpa buka Google Sheet. -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="card-elegant p-6 rounded-3xl space-y-4">
             <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
               <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
                 <i class="fa-solid fa-users text-indigo-600"></i><span>Daftar Mahasiswa -- Pertemuan Ini</span>
@@ -418,7 +498,7 @@
             </div>
           </div>
 
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="card-elegant p-6 rounded-3xl space-y-4">
             <div class="flex justify-between items-center border-b pb-3 flex-wrap gap-2">
               <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
                 <i class="fa-solid fa-table-list text-indigo-600"></i><span>Rekap Nilai Kelas Ini (untuk dipindahkan ke SIKAMU)</span>
@@ -446,7 +526,7 @@
         </div>
 
         <!-- Kotak Nilai (nilai berjalan mahasiswa) -->
-        <div id="kotakNilai" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div id="kotakNilai" class="card-elegant p-6 rounded-3xl">
           <div class="flex justify-between items-center border-b pb-3 mb-3">
             <h3 class="font-bold text-lg text-slate-900 flex items-center space-x-2">
               <i class="fa-solid fa-chart-simple text-indigo-600"></i><span>Kotak Nilai (Progress Berjalan)</span>
@@ -461,7 +541,7 @@
         <!-- Grid Fitur Pembelajaran (khusus tampilan mahasiswa -- dosen mengatur link yang sama
              lewat form "Materi & Lokasi Presensi" di atas, tidak perlu lihat preview kartu ini) -->
         <div id="fiturPembelajaranGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button type="button" id="btnYT" onclick="playYoutubeInline()" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-red-400 hover:shadow-md transition group flex items-center space-x-4 text-left w-full">
+          <button type="button" id="btnYT" onclick="playYoutubeInline()" class="card-elegant p-5 rounded-2xl hover:border-red-400 hover:shadow-md transition group flex items-center space-x-4 text-left w-full">
             <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl group-hover:bg-red-600 group-hover:text-white transition">
               <i class="fa-brands fa-youtube"></i>
             </div>
@@ -471,7 +551,7 @@
             </div>
           </button>
 
-          <a id="btnPPT" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-md transition group flex items-center space-x-4">
+          <a id="btnPPT" href="#" target="_blank" class="card-elegant p-5 rounded-2xl hover:border-amber-400 hover:shadow-md transition group flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:bg-amber-600 group-hover:text-white transition">
               <i class="fa-solid fa-file-powerpoint"></i>
             </div>
@@ -481,7 +561,7 @@
             </div>
           </a>
 
-          <button id="btnKuisOnlineCard" onclick="startKuis()" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-purple-400 hover:shadow-md transition group flex items-center space-x-4 text-left">
+          <button id="btnKuisOnlineCard" onclick="startKuis()" class="card-elegant p-5 rounded-2xl hover:border-purple-400 hover:shadow-md transition group flex items-center space-x-4 text-left">
             <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl group-hover:bg-purple-600 group-hover:text-white transition">
               <i class="fa-solid fa-pen-to-square"></i>
             </div>
@@ -491,7 +571,7 @@
             </div>
           </button>
 
-          <a id="btnPDF" href="#" target="_blank" class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-indigo-400 hover:shadow-md transition group flex items-center space-x-4">
+          <a id="btnPDF" href="#" target="_blank" class="card-elegant p-5 rounded-2xl hover:border-indigo-400 hover:shadow-md transition group flex items-center space-x-4">
             <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition">
               <i class="fa-solid fa-book-open"></i>
             </div>
@@ -511,8 +591,8 @@
 
         <!-- Submissions & Forum (khusus tampilan mahasiswa) -->
         <div id="studentSubmissionGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div id="tugasCard" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+          <div id="tugasCard" class="card-elegant p-6 rounded-3xl space-y-4">
+            <h3 class="font-bold text-lg text-slate-900 pb-3 flex items-center space-x-2 heading-ornament">
               <i class="fa-solid fa-upload text-indigo-600"></i>
               <span>Pengumpulan Tugas (Submissions)</span>
             </h3>
@@ -548,9 +628,9 @@
           </div>
 
           <!-- Forum Pemantik -->
-          <div id="forumCard" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+          <div id="forumCard" class="card-elegant p-6 rounded-3xl space-y-4 flex flex-col justify-between">
             <div>
-              <h3 class="font-bold text-lg text-slate-900 border-b pb-3 flex items-center space-x-2">
+              <h3 class="font-bold text-lg text-slate-900 pb-3 flex items-center space-x-2 heading-ornament">
                 <i class="fa-solid fa-comments text-indigo-600"></i>
                 <span>Forum Pemantik & Diskusi Kasus</span>
               </h3>

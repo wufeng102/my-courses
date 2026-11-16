@@ -8,8 +8,8 @@
 // offline. JANGAN diubah jadi cache-first tanpa pertimbangan ulang, itu akan menghidupkan lagi
 // masalah "halaman nyangkut versi lama" yang sudah susah payah diperbaiki.
 
-const CACHE_NAME = 'my-courses-shell-v1';
-const APP_SHELL = ['./index.html', './manifest.json'];
+const CACHE_NAME = 'my-courses-shell-v2';
+const APP_SHELL = ['./index.html', './manifest.json', './logo.png'];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
