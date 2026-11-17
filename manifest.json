@@ -2,7 +2,7 @@
   "name": "My-Courses - Portal Pembelajaran Daring",
   "short_name": "My-Courses",
   "description": "Presensi GPS, materi kuliah, forum diskusi, kuis online, dan pengumpulan tugas -- Andi Azhar.",
-  "id": "/my-courses/",
+  "id": "/",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
